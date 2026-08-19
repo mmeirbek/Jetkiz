@@ -144,9 +144,11 @@ export class TrackingService {
       NEW: 0,
       SEARCHING: 1,
       ASSIGNED: 2,
-      IN_TRANSIT: 3,
-      DELIVERED: 4,
-      CANCELLED: 5,
+      PICKED_UP: 3,
+      IN_TRANSIT: 4,
+      AT_CHECKPOINT: 5,
+      DELIVERED: 6,
+      CANCELLED: 7,
     };
 
     if (statusRank[next] < statusRank[current]) {
