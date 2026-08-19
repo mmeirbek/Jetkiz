@@ -14,6 +14,9 @@ import { RoutesModule } from './routes/routes.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { CheckpointLoadsModule } from './checkpoint-loads/checkpoint-loads.module';
 import { PredictionsModule } from './predictions/predictions.module';
+import { DevicesModule } from './devices/devices.module';
+import { TelemetryModule } from './telemetry/telemetry.module';
+import { MqttModule } from './mqtt/mqtt.module';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { PredictionsModule } from './predictions/predictions.module';
     UploadsModule,
     CheckpointLoadsModule,
     PredictionsModule,
+    DevicesModule,
+    TelemetryModule,
+    MqttModule,
   ],
   controllers: [AppController],
   providers: [AppService],
