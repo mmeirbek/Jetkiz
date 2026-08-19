@@ -10,6 +10,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   (app.getHttpAdapter().getInstance() as express.Express).set('trust proxy', 1);
 
+  app.enableCors({
+    origin: process.env.CORS_ORIGINS
+      ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
+      : true,
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  });
+
   app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
 
   app.use(
