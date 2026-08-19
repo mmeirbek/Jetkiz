@@ -138,7 +138,9 @@ export class UpdateSuperadminOrderDto {
   })
   @Transform(({ value }: TransformFnParams): unknown =>
     Array.isArray(value)
-      ? value.map((item) => (typeof item === 'string' ? item.trim() : item))
+      ? value.map((item: unknown) =>
+          typeof item === 'string' ? item.trim() : item,
+        )
       : value,
   )
   @IsOptional()

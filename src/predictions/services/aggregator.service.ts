@@ -25,10 +25,15 @@ export type AggregatedInput = {
 
 @Injectable()
 export class AggregatorService {
-  aggregate(route: {
-    distanceKm: number;
-    durationMinutes: number;
-  }, weatherPoints: WeatherPoint[], checkpoints: Checkpoint[], railwayNodes: TrainSchedule[]): AggregatedInput {
+  aggregate(
+    route: {
+      distanceKm: number;
+      durationMinutes: number;
+    },
+    weatherPoints: WeatherPoint[],
+    checkpoints: Checkpoint[],
+    railwayNodes: TrainSchedule[],
+  ): AggregatedInput {
     const weather = this.aggregateWeather(weatherPoints);
 
     return {
@@ -49,9 +54,7 @@ export class AggregatorService {
     };
   }
 
-  private aggregateWeather(
-    points: WeatherPoint[],
-  ): AggregatedInput['weather'] {
+  private aggregateWeather(points: WeatherPoint[]): AggregatedInput['weather'] {
     if (points.length === 0) {
       return { risk: 'low', wind: 0, rain: false };
     }

@@ -22,7 +22,9 @@ export class RegisterRateLimitGuard implements CanActivate {
     const key = this.resolveClientKey(request);
     const threshold = now - this.windowMs;
 
-    const recent = (this.attempts.get(key) ?? []).filter((ts) => ts >= threshold);
+    const recent = (this.attempts.get(key) ?? []).filter(
+      (ts) => ts >= threshold,
+    );
     if (recent.length >= this.maxAttempts) {
       throw new HttpException(
         'Too many registration attempts. Please try again later.',

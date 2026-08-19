@@ -166,6 +166,30 @@ describe('VroomService', () => {
     expect(decoded.coordinates.length).toBeGreaterThan(1);
   });
 
+  it('decodes route-level geometry when steps have none (VROOM 1.15)', () => {
+    const decoded = service.decodeRoute({
+      vehicle: 1,
+      distance: 6994,
+      duration: 576,
+      geometry: 's||lF}c{cPzAoGv@eBa@t@q@dAcC',
+      steps: [
+        {
+          type: 'start',
+          location: [76.9456, 43.2383],
+        },
+        {
+          type: 'job',
+          id: 1,
+          location: [76.99, 43.27],
+        },
+      ],
+    });
+
+    expect(decoded.distanceKm).toBe(6.99);
+    expect(decoded.durationMinutes).toBe(9.6);
+    expect(decoded.coordinates.length).toBeGreaterThan(1);
+  });
+
   it('throws bad gateway when route payload is invalid', () => {
     expect(() => service.decodeRoute(undefined)).toThrow(BadGatewayException);
   });

@@ -118,13 +118,24 @@ export class VroomService {
     }
 
     const coordinates: VroomLocation[] = [];
-    for (const step of route.steps ?? []) {
-      if (step.geometry) {
-        const decoded = decodePolyline(step.geometry);
-        for (const point of decoded) {
-          const last = coordinates[coordinates.length - 1];
-          if (!last || last[0] !== point[0] || last[1] !== point[1]) {
-            coordinates.push(point);
+
+    if (typeof route.geometry === 'string' && route.geometry.length > 0) {
+      const decoded = decodePolyline(route.geometry);
+      for (const point of decoded) {
+        const last = coordinates[coordinates.length - 1];
+        if (!last || last[0] !== point[0] || last[1] !== point[1]) {
+          coordinates.push(point);
+        }
+      }
+    } else {
+      for (const step of route.steps ?? []) {
+        if (step.geometry) {
+          const decoded = decodePolyline(step.geometry);
+          for (const point of decoded) {
+            const last = coordinates[coordinates.length - 1];
+            if (!last || last[0] !== point[0] || last[1] !== point[1]) {
+              coordinates.push(point);
+            }
           }
         }
       }

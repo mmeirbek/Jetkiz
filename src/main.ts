@@ -8,22 +8,28 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.getHttpAdapter().getInstance().set('trust proxy', 1);
+  (app.getHttpAdapter().getInstance() as express.Express).set('trust proxy', 1);
 
   app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
 
-  app.use((req, res, next) => {
-    if (
-      req.path === '/docs-json' ||
-      req.path === '/docs' ||
-      req.path.startsWith('/docs/')
-    ) {
-      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-    }
-    next();
-  });
+  app.use(
+    (
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction,
+    ) => {
+      if (
+        req.path === '/docs-json' ||
+        req.path === '/docs' ||
+        req.path.startsWith('/docs/')
+      ) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      }
+      next();
+    },
+  );
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -51,11 +57,9 @@ async function bootstrap() {
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, swaggerDocument, {
     jsonDocumentUrl: 'docs-json',
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
   });
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+
+void bootstrap();

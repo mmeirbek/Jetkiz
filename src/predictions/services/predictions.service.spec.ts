@@ -48,7 +48,15 @@ describe('PredictionsService', () => {
     ]);
 
     openWeatherServiceMock.getWeatherForPoints.mockResolvedValue([
-      { lat: 43.65, lng: 51.17, temperature: 25, windSpeed: 10, rain: false, snow: false, description: 'clear' },
+      {
+        lat: 43.65,
+        lng: 51.17,
+        temperature: 25,
+        windSpeed: 10,
+        rain: false,
+        snow: false,
+        description: 'clear',
+      },
     ]);
 
     routePointResolverMock.findNearbyCheckpoints.mockResolvedValue([]);
@@ -83,7 +91,9 @@ describe('PredictionsService', () => {
 
   it('throws on missing order', async () => {
     prismaMock.order.findUnique.mockResolvedValue(null);
-    await expect(service.predictLand('bad-id')).rejects.toThrow('Order not found');
+    await expect(service.predictLand('bad-id')).rejects.toThrow(
+      'Order not found',
+    );
   });
 
   it('throws on order without coordinates', async () => {

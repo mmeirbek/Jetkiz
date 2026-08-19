@@ -94,10 +94,7 @@ describe('RoutePointResolverService', () => {
         },
       ]);
 
-      const result = await service.findNearbyCheckpoints(
-        [[51.17, 43.65]],
-        10,
-      );
+      const result = await service.findNearbyCheckpoints([[51.17, 43.65]], 10);
 
       expect(result).toHaveLength(0);
     });

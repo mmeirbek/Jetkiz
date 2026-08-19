@@ -24,7 +24,7 @@ const server = http.createServer((req, res) => {
       {
         hostname: target.hostname,
         port: 443,
-        path: '/v2' + path,
+        path: path,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

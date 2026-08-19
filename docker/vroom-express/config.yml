@@ -19,27 +19,31 @@ routingServers:
     # Requests are proxied through the local `ors-proxy` service which
     # adds the Authorization header (OPENROUTESERVICE_API_KEY) before
     # forwarding to the public OpenRouteService API.
+    # Keys are ORS profile names and must match the `profile` sent in
+    # each vehicle (VROOM v1.15 uses the profile name in the URL path).
+    # The `/v2` slug is part of the host path (`ors-proxy/v2`) and the
+    # proxy forwards the path as-is (see docker/ors-proxy/server.js).
     driving-car:
-      host: 'ors-proxy'
+      host: 'ors-proxy/v2'
       port: '8090'
     driving-hgv:
-      host: 'ors-proxy'
+      host: 'ors-proxy/v2'
       port: '8090'
     cycling-regular:
-      host: 'ors-proxy'
+      host: 'ors-proxy/v2'
       port: '8090'
     cycling-mountain:
-      host: 'ors-proxy'
+      host: 'ors-proxy/v2'
       port: '8090'
     cycling-road:
-      host: 'ors-proxy'
+      host: 'ors-proxy/v2'
       port: '8090'
     cycling-electric:
-      host: 'ors-proxy'
+      host: 'ors-proxy/v2'
       port: '8090'
     foot-walking:
-      host: 'ors-proxy'
+      host: 'ors-proxy/v2'
       port: '8090'
     foot-hiking:
-      host: 'ors-proxy'
+      host: 'ors-proxy/v2'
       port: '8090'

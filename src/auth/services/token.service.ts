@@ -36,10 +36,7 @@ export class TokenService {
 
   constructor(private readonly jwtService: JwtService) {}
 
-  async issueTokenPair(params: {
-    userId: string;
-    role: UserRole;
-  }) {
+  async issueTokenPair(params: { userId: string; role: UserRole }) {
     const accessPayload: AccessTokenPayload = {
       sub: params.userId,
       role: params.role,

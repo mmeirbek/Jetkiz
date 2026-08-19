@@ -110,7 +110,6 @@ export class CheckpointLoadsService {
     const existing = await this.prisma.checkpoint.findMany({
       where: { name: { in: loads.map((l) => l.checkpointName) } },
     });
-    const existingNames = new Set(existing.map((c) => c.name));
 
     for (const load of loads) {
       await this.prisma.checkpoint.upsert({
@@ -159,7 +158,9 @@ export class CheckpointLoadsService {
   }
 
   private async fetchScoreboardLoads(
-    checkpoints: Awaited<ReturnType<CheckpointLoadsService['fetchCheckpointCatalog']>>,
+    checkpoints: Awaited<
+      ReturnType<CheckpointLoadsService['fetchCheckpointCatalog']>
+    >,
   ): Promise<CheckpointLoad[]> {
     const loads: CheckpointLoad[] = [];
 
@@ -175,7 +176,9 @@ export class CheckpointLoadsService {
   }
 
   private async fetchSingleCheckpointLoad(
-    checkpoint: Awaited<ReturnType<CheckpointLoadsService['fetchCheckpointCatalog']>>[number],
+    checkpoint: Awaited<
+      ReturnType<CheckpointLoadsService['fetchCheckpointCatalog']>
+    >[number],
   ): Promise<CheckpointLoad> {
     try {
       const html = await this.fetchHtml(

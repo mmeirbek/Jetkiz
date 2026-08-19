@@ -10,6 +10,8 @@ import type { Request } from 'express';
 const DEFAULT_ME_RATE_LIMIT_MAX = 120;
 const DEFAULT_ME_RATE_LIMIT_WINDOW_SEC = 60;
 
+type RateLimitRequest = Request & { authUser?: { id: string } };
+
 @Injectable()
 export class MeRateLimitGuard implements CanActivate {
   private readonly attempts = new Map<string, number[]>();
@@ -17,7 +19,7 @@ export class MeRateLimitGuard implements CanActivate {
   private readonly windowMs = this.resolveWindowMs();
 
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest<any>();
+    const request = context.switchToHttp().getRequest<RateLimitRequest>();
     const now = Date.now();
     const key = this.resolveClientKey(request);
     const threshold = now - this.windowMs;
@@ -37,7 +39,7 @@ export class MeRateLimitGuard implements CanActivate {
     return true;
   }
 
-  private resolveClientKey(request: any): string {
+  private resolveClientKey(request: RateLimitRequest): string {
     const userId = request.authUser?.id;
     if (userId) {
       return `user:${userId}`;

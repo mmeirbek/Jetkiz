@@ -251,7 +251,7 @@ describe('RoutesService', () => {
               status: 404,
               statusText: 'Not Found',
               headers: {},
-              config: {} as any,
+              config: undefined as never,
               data: {
                 error: {
                   code: 2010,
@@ -287,7 +287,7 @@ describe('RoutesService', () => {
               status: 401,
               statusText: 'Unauthorized',
               headers: {},
-              config: {} as any,
+              config: undefined as never,
               data: {
                 error: 'Authorization field missing',
               },

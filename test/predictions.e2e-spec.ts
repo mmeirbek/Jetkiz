@@ -7,6 +7,16 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import { AppModule } from '../src/app.module';
 
+type PredictionBody = {
+  orderId?: string;
+  recommendation?: string;
+  riskLevel?: string;
+  bestDepartureTime?: string;
+  expectedDelayMinutes?: number;
+  shortExplanation?: string;
+  message?: string;
+};
+
 describe('PredictionsModule (e2e)', () => {
   let app: INestApplication<App>;
 
@@ -61,7 +71,7 @@ describe('PredictionsModule (e2e)', () => {
           },
         });
 
-        order = await prisma.order.findUnique({ where: { id: order.id } })!;
+        order = await prisma.order.findUnique({ where: { id: order.id } });
       }
 
       orderId = order!.id;
@@ -103,26 +113,31 @@ describe('PredictionsModule (e2e)', () => {
         .post('/predictions/land')
         .send({ orderId })
         .expect((res) => {
-          console.log(`\nResponse status: ${res.status}`);
-          console.log(`Response body:`, JSON.stringify(res.body, null, 2));
+          const body = res.body as PredictionBody;
 
           if (res.status === 201) {
             // Full success
-            expect(res.body).toHaveProperty('orderId', orderId);
-            expect(res.body).toHaveProperty('recommendation');
-            expect(res.body).toHaveProperty('riskLevel');
-            expect(res.body).toHaveProperty('bestDepartureTime');
-            expect(res.body).toHaveProperty('expectedDelayMinutes');
-            expect(res.body).toHaveProperty('shortExplanation');
-            expect(['send', 'wait', 'alternative']).toContain(res.body.recommendation);
-            expect(['low', 'medium', 'high']).toContain(res.body.riskLevel);
+            expect(body).toHaveProperty('orderId', orderId);
+            expect(body).toHaveProperty('recommendation');
+            expect(body).toHaveProperty('riskLevel');
+            expect(body).toHaveProperty('bestDepartureTime');
+            expect(body).toHaveProperty('expectedDelayMinutes');
+            expect(body).toHaveProperty('shortExplanation');
+            expect(['send', 'wait', 'alternative']).toContain(
+              body.recommendation,
+            );
+            expect(['low', 'medium', 'high']).toContain(body.riskLevel);
             console.log('\n✓ Full prediction pipeline succeeded!');
           } else if (res.status === 502) {
             // External API failure (e.g. no OpenAI key)
-            expect(res.body).toHaveProperty('message');
-            console.log(`\n! Partial failure: ${res.body.message}`);
-            console.log('  Route calculation likely worked, but external AI/weather API failed.');
-            console.log('  Add OPENAI_API_KEY and OPENWEATHER_API_KEY to .env for full test.');
+            expect(body).toHaveProperty('message');
+            console.log(`\n! Partial failure: ${body.message}`);
+            console.log(
+              '  Route calculation likely worked, but external AI/weather API failed.',
+            );
+            console.log(
+              '  Add OPENAI_API_KEY and OPENWEATHER_API_KEY to .env for full test.',
+            );
           } else {
             console.log(`\n! Unexpected status: ${res.status}`);
           }
@@ -131,7 +146,9 @@ describe('PredictionsModule (e2e)', () => {
 
     it('should succeed if all env keys are set', async () => {
       if (!process.env.OPENAI_API_KEY || !process.env.OPENWEATHER_API_KEY) {
-        console.log('\nSkipping — set OPENAI_API_KEY and OPENWEATHER_API_KEY in .env');
+        console.log(
+          '\nSkipping — set OPENAI_API_KEY and OPENWEATHER_API_KEY in .env',
+        );
         return;
       }
 
@@ -142,17 +159,18 @@ describe('PredictionsModule (e2e)', () => {
       expect(res.status).toBe(201);
       expect(res.body).toMatchObject({
         orderId,
-        recommendation: expect.any(String),
-        riskLevel: expect.any(String),
-        bestDepartureTime: expect.any(String),
-        expectedDelayMinutes: expect.any(Number),
-        shortExplanation: expect.any(String),
+        recommendation: expect.any(String) as string,
+        riskLevel: expect.any(String) as string,
+        bestDepartureTime: expect.any(String) as string,
+        expectedDelayMinutes: expect.any(Number) as number,
+        shortExplanation: expect.any(String) as string,
       });
+      const body = res.body as PredictionBody;
       console.log('\n✓ Full prediction with all APIs succeeded!');
-      console.log(`  Recommendation: ${res.body.recommendation}`);
-      console.log(`  Risk: ${res.body.riskLevel}`);
-      console.log(`  Delay: ${res.body.expectedDelayMinutes}min`);
-      console.log(`  Explanation: ${res.body.shortExplanation}`);
+      console.log(`  Recommendation: ${body.recommendation}`);
+      console.log(`  Risk: ${body.riskLevel}`);
+      console.log(`  Delay: ${body.expectedDelayMinutes}min`);
+      console.log(`  Explanation: ${body.shortExplanation}`);
     });
   });
 
@@ -171,7 +189,10 @@ describe('PredictionsModule (e2e)', () => {
           expect(res.body).toHaveProperty('recommendation', 'send');
           expect(res.body).toHaveProperty('riskLevel', 'low');
           expect(res.body).toHaveProperty('shortExplanation');
-          console.log(`\nMarine stub response:`, JSON.stringify(res.body, null, 2));
+          console.log(
+            `\nMarine stub response:`,
+            JSON.stringify(res.body, null, 2),
+          );
         });
     });
 

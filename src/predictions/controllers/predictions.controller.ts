@@ -25,7 +25,9 @@ export class PredictionsController {
   constructor(private readonly predictionsService: PredictionsService) {}
 
   @Post('land')
-  @ApiOperation({ summary: 'Get a land route logistics prediction for an order' })
+  @ApiOperation({
+    summary: 'Get a land route logistics prediction for an order',
+  })
   @ApiCreatedResponse({ type: LandPredictionResponseDto })
   @ApiBadRequestResponse({ type: ErrorResponseDto })
   @ApiBadGatewayResponse({ type: ErrorResponseDto })

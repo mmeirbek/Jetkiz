@@ -9,6 +9,9 @@ import type { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../constants/auth.constants';
 import { UsersRepository } from '../../users/repositories/users.repository';
 import { TokenService } from '../../auth/services/token.service';
+import type { AuthUser } from '../types/auth-user.type';
+
+export type AuthenticatedRequest = Request & { authUser: AuthUser };
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -28,7 +31,7 @@ export class JwtAuthGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<any>();
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const token = this.extractBearerToken(request);
     if (!token) {
       throw new UnauthorizedException('Missing Bearer token');

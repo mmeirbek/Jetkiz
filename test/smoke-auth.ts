@@ -83,7 +83,10 @@ async function main() {
   let app: INestApplication | null = null;
 
   try {
-    console.log('[DEBUG] DATABASE_URL in process.env:', process.env.DATABASE_URL);
+    console.log(
+      '[DEBUG] DATABASE_URL in process.env:',
+      process.env.DATABASE_URL,
+    );
     console.log('[DEBUG] Initializing Nest application...');
     app = await NestFactory.create(AppModule, { logger: false });
     console.log('[DEBUG] App created, calling app.init()...');
@@ -100,38 +103,38 @@ async function main() {
     // 1. Register Client account
     console.log('Testing [POST /auth/register] ...');
     const registerRes = await withTimeout(
-      request(server)
-        .post('/auth/register')
-        .send({
-          email: 'test_client@caspex.local',
-          password: 'CaspXPass_123',
-          role: 'CLIENT',
-          firstName: 'Alibi',
-          lastName: 'Samatov',
-          phone: '+77017777777',
-          city: 'Aktau',
-          country: 'Kazakhstan',
-        }),
+      request(server).post('/auth/register').send({
+        email: 'test_client@caspex.local',
+        password: 'CaspXPass_123',
+        role: 'CLIENT',
+        firstName: 'Alibi',
+        lastName: 'Samatov',
+        phone: '+77017777777',
+        city: 'Aktau',
+        country: 'Kazakhstan',
+      }),
     ).expect(201);
 
     const registerBody = asRecord(registerRes.body, 'registerRes.body');
     const registeredUser = asRecord(registerBody.user, 'registerRes.body.user');
-    const registeredEmail = readString(registeredUser, 'email', 'registerRes.body.user');
+    const registeredEmail = readString(
+      registeredUser,
+      'email',
+      'registerRes.body.user',
+    );
     console.log(`✅ Registration Success: email=${registeredEmail}`);
 
     // 2. Register Client Duplicate check
     console.log('Testing [POST /auth/register] Duplicate Email ...');
     await withTimeout(
-      request(server)
-        .post('/auth/register')
-        .send({
-          email: 'test_client@caspex.local',
-          password: 'CaspXPass_123',
-          role: 'CLIENT',
-          firstName: 'Alibi',
-          lastName: 'Samatov',
-          phone: '+77017777777',
-        }),
+      request(server).post('/auth/register').send({
+        email: 'test_client@caspex.local',
+        password: 'CaspXPass_123',
+        role: 'CLIENT',
+        firstName: 'Alibi',
+        lastName: 'Samatov',
+        phone: '+77017777777',
+      }),
     ).expect(409);
     console.log('✅ Duplicate Registration Properly Blocked (409)');
 
@@ -151,9 +154,7 @@ async function main() {
     // 4. Me Profile
     console.log('Testing [GET /auth/me] with Access Token ...');
     const meRes = await withTimeout(
-      request(server)
-        .get('/auth/me')
-        .set('Authorization', `Bearer ${access}`),
+      request(server).get('/auth/me').set('Authorization', `Bearer ${access}`),
     ).expect(200);
 
     const meBody = asRecord(meRes.body, 'meRes.body');
@@ -164,13 +165,14 @@ async function main() {
     // 5. Refresh
     console.log('Testing [POST /auth/refresh] ...');
     const refreshRes = await withTimeout(
-      request(server)
-        .post('/auth/refresh')
-        .send({ refreshToken: refresh }),
+      request(server).post('/auth/refresh').send({ refreshToken: refresh }),
     ).expect(201);
     const refreshBody = asRecord(refreshRes.body, 'refreshRes.body');
-    const rotatedAccess = readString(refreshBody, 'accessToken', 'refreshRes');
-    const rotatedRefresh = readString(refreshBody, 'refreshToken', 'refreshRes');
+    const rotatedRefresh = readString(
+      refreshBody,
+      'refreshToken',
+      'refreshRes',
+    );
     console.log('✅ Token Rotation Success: received new token pair');
 
     // 6. Logout
@@ -185,7 +187,9 @@ async function main() {
     console.log(`✅ Logout Success: ${logoutSuccess}`);
 
     // 7. Refresh Denied after Logout
-    console.log('Testing [POST /auth/refresh] with Expired/Revoked Token (Expect 401) ...');
+    console.log(
+      'Testing [POST /auth/refresh] with Expired/Revoked Token (Expect 401) ...',
+    );
     await withTimeout(
       request(server)
         .post('/auth/refresh')

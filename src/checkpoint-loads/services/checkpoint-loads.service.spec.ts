@@ -24,12 +24,14 @@ describe('CheckpointLoadsService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    prismaMock.$transaction.mockImplementation(async (operations: unknown[]) => {
-      for (const operation of operations) {
-        await operation;
-      }
-      return [];
-    });
+    prismaMock.$transaction.mockImplementation(
+      async (operations: unknown[]) => {
+        for (const operation of operations) {
+          await operation;
+        }
+        return [];
+      },
+    );
     prismaMock.checkpointLoadSnapshot.create.mockResolvedValue(undefined);
     prismaMock.checkpoint.findMany.mockResolvedValue([]);
     prismaMock.checkpoint.upsert.mockResolvedValue(undefined);
@@ -73,6 +75,7 @@ describe('CheckpointLoadsService', () => {
     );
     expect(prismaMock.checkpointLoadSnapshot.create).toHaveBeenCalledWith(
       expect.objectContaining({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- jest.objectContaining returns `any`
         data: expect.objectContaining({
           checkpointName: 'Достык - Алашанькоу',
           borderCountry: 'Китай',
@@ -117,6 +120,7 @@ describe('CheckpointLoadsService', () => {
     expect(result.activeWaitingTotal).toBe(0);
     expect(prismaMock.checkpointLoadSnapshot.create).toHaveBeenCalledWith(
       expect.objectContaining({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- jest.objectContaining returns `any`
         data: expect.objectContaining({
           waitingAreaCount: 0,
         }),

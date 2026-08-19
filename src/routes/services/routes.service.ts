@@ -116,7 +116,9 @@ export class RoutesService {
     return { startLat, startLng, endLat, endLng };
   }
 
-  private async requestRouteViaVroom(coords: Coordinates): Promise<ParsedRoute> {
+  private async requestRouteViaVroom(
+    coords: Coordinates,
+  ): Promise<ParsedRoute> {
     const origin: [number, number] = [coords.startLng, coords.startLat];
     const destination: [number, number] = [coords.endLng, coords.endLat];
 
@@ -187,7 +189,7 @@ export class RoutesService {
 
       return response.data;
     } catch (error) {
-      throw this.mapOrsError(error);
+      this.mapOrsError(error);
     }
   }
 
@@ -251,7 +253,7 @@ export class RoutesService {
     return carrierProfile?.id === order.carrierId;
   }
 
-  private mapOrsError(error: unknown) {
+  private mapOrsError(error: unknown): never {
     if (error instanceof AxiosError) {
       if (!error.response) {
         throw new BadGatewayException('OpenRouteService is unavailable');

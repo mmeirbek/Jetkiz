@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Order, UserRole } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import { unlink } from 'fs/promises';
 import { join, normalize, relative } from 'path';
 import { AuthUser } from '../../common/types/auth-user.type';
@@ -38,11 +38,7 @@ export class UploadsService {
     };
   }
 
-  async attachCargoPhoto(
-    authUser: AuthUser,
-    orderId: string,
-    fileUrl: string,
-  ) {
+  async attachCargoPhoto(authUser: AuthUser, orderId: string, fileUrl: string) {
     const order = await this.findOwnedOrderOrThrow(authUser, orderId);
 
     await this.deleteLocalUpload(order.cargoPhotoUrl);

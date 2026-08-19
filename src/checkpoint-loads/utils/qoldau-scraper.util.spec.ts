@@ -96,17 +96,17 @@ describe('qoldau-scraper.util', () => {
     const result = parseWaitingAreaPage(html);
 
     expect(result.totalPages).toBe(73);
-      expect(result.entries).toEqual([
-        {
-          waitingAreaName: 'Зона ожидания при пункте пропуска "Достык"',
-          checkpointName: 'Достык - Алашанькоу',
-          truckNumber: 'AM8295H',
-          entryTime: '12.06.2026 03:01:47',
-          exitTime: null,
-          stayPeriod: null,
-          status: 'В зоне ожидания',
-          activeBookingSlot: '13.06.2026 16:00 - 17:00',
-        },
-      ]);
+    expect(result.entries).toEqual([
+      {
+        waitingAreaName: 'Зона ожидания при пункте пропуска "Достык"',
+        checkpointName: 'Достык - Алашанькоу',
+        truckNumber: 'AM8295H',
+        entryTime: '12.06.2026 03:01:47',
+        exitTime: null,
+        stayPeriod: null,
+        status: 'В зоне ожидания',
+        activeBookingSlot: '13.06.2026 16:00 - 17:00',
+      },
+    ]);
   });
 });

@@ -57,14 +57,22 @@ export class ListSuperadminCarriersQueryDto {
   isApproved?: boolean;
 
   @ApiPropertyOptional({ example: 'ROAD' })
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }): unknown =>
+    Array.isArray(value)
+      ? value.map((item: unknown) =>
+          typeof item === 'string' ? item.trim() : item,
+        )
+      : value,
+  )
   @IsOptional()
   @IsString()
   @MaxLength(50)
   transportType?: string;
 
   @ApiPropertyOptional({ example: 'aktau' })
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }): unknown =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   @IsOptional()
   @IsString()
   @MaxLength(200)

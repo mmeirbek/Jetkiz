@@ -24,6 +24,7 @@ import { randomUUID } from 'crypto';
 import { existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
+import type { MulterFile } from 'multer';
 import type { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -54,11 +55,14 @@ function ensureDirectory(path: string) {
 
 function fileFilter(
   _req: Request,
-  file: any,
+  file: MulterFile,
   callback: (error: Error | null, acceptFile: boolean) => void,
 ) {
   if (!IMAGE_MIME_TYPES.has(file.mimetype)) {
-    callback(new BadRequestException('Only JPG, PNG, and WEBP files are allowed'), false);
+    callback(
+      new BadRequestException('Only JPG, PNG, and WEBP files are allowed'),
+      false,
+    );
     return;
   }
 
@@ -91,7 +95,7 @@ function createFileInterceptor(subdir: string) {
   });
 }
 
-function requireFile(file: any | undefined) {
+function requireFile(file: MulterFile | undefined): asserts file is MulterFile {
   if (!file) {
     throw new BadRequestException('Image file is required');
   }
@@ -146,7 +150,7 @@ export class UploadsController {
   })
   uploadAvatar(
     @CurrentUser() authUser: AuthUser,
-    @UploadedFile() file: any | undefined,
+    @UploadedFile() file: MulterFile | undefined,
     @Req() request: Request,
   ) {
     requireFile(file);
@@ -160,7 +164,9 @@ export class UploadsController {
 
   @Post('cargo')
   @UseInterceptors(createFileInterceptor('cargo'))
-  @ApiOperation({ summary: 'Upload cargo image and update order cargoPhotoUrl' })
+  @ApiOperation({
+    summary: 'Upload cargo image and update order cargoPhotoUrl',
+  })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -194,7 +200,7 @@ export class UploadsController {
   uploadCargoPhoto(
     @CurrentUser() authUser: AuthUser,
     @Body() dto: UploadOrderMediaFormDto,
-    @UploadedFile() file: any | undefined,
+    @UploadedFile() file: MulterFile | undefined,
     @Req() request: Request,
   ) {
     requireFile(file);
@@ -245,7 +251,7 @@ export class UploadsController {
   uploadProductPhoto(
     @CurrentUser() authUser: AuthUser,
     @Body() dto: UploadOrderMediaFormDto,
-    @UploadedFile() file: any | undefined,
+    @UploadedFile() file: MulterFile | undefined,
     @Req() request: Request,
   ) {
     requireFile(file);

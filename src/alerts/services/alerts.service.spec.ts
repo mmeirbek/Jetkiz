@@ -285,6 +285,7 @@ describe('AlertsService', () => {
     const result = await service.listAlerts(carrier, {});
 
     expect(alertsRepositoryMock.findAlerts).toHaveBeenCalledWith({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- jest.objectContaining returns `any`
       where: expect.objectContaining({
         vehicle: { carrierId: carrierProfile.id },
       }),

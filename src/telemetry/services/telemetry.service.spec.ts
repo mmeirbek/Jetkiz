@@ -64,7 +64,7 @@ describe('TelemetryService', () => {
     expect(telemetryRepositoryMock.findLastByVehicle).toHaveBeenCalledWith(
       'vehicle-1',
     );
-    expect(result.telemetry.id).toBe('tel-1');
+    expect(result.telemetry?.id).toBe('tel-1');
   });
 
   it('buckets vehicle history into hourly aggregates', async () => {
@@ -148,7 +148,7 @@ describe('TelemetryService', () => {
 
     const result = await service.getOrderLive(client, 'order-1');
 
-    expect(result.telemetry.id).toBe('tel-9');
+    expect(result.telemetry?.id).toBe('tel-9');
   });
 
   it('rejects telemetry for orders the user cannot see', async () => {

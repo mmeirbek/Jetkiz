@@ -177,6 +177,7 @@ describe('AuthService', () => {
     expect(refreshTokenRepositoryMock.create).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: baseUser.id,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- jest.any returns `any`
         tokenHash: expect.any(String),
         userAgent: 'jest-agent',
         ipAddress: '203.0.113.10',

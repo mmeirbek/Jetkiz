@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { BadGatewayException, Injectable } from '@nestjs/common';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import type { AggregatedInput } from './aggregator.service';
 
@@ -46,7 +46,7 @@ export class OpenAiService {
       throw new BadGatewayException('OPENAI_API_KEY is not configured');
     }
 
-    let response;
+    let response: AxiosResponse<OpenAiResponse>;
     try {
       response = await firstValueFrom(
         this.httpService.post<OpenAiResponse>(

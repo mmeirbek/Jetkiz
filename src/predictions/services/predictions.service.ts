@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RoutesService } from '../../routes/services/routes.service';
 import { AggregatorService } from './aggregator.service';
@@ -18,15 +22,19 @@ export class PredictionsService {
   ) {}
 
   async predictLand(orderId: string) {
-    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
     if (!order) {
       throw new NotFoundException('Order not found');
     }
 
     const { originLat, originLng, destinationLat, destinationLng } = order;
     if (
-      originLat == null || originLng == null ||
-      destinationLat == null || destinationLng == null
+      originLat == null ||
+      originLng == null ||
+      destinationLat == null ||
+      destinationLng == null
     ) {
       throw new BadRequestException(
         'Order has no coordinates. Set origin and destination coordinates first.',
@@ -36,7 +44,7 @@ export class PredictionsService {
     const route = await this.routesService.calculate(
       {
         id: '',
-        role: 'SUPERADMIN' as any,
+        role: 'SUPERADMIN',
         email: '',
         firstName: '',
         lastName: '',
@@ -56,8 +64,8 @@ export class PredictionsService {
       5,
     );
 
-    const [weatherPoints, nearbyCheckpoints, nearbyRailway] =
-      await Promise.all([
+    const [weatherPoints, nearbyCheckpoints, nearbyRailway] = await Promise.all(
+      [
         this.openWeatherService.getWeatherForPoints(waypoints),
         this.routePointResolver.findNearbyCheckpoints(
           route.geometry.coordinates,
@@ -67,7 +75,8 @@ export class PredictionsService {
           route.geometry.coordinates,
           50,
         ),
-      ]);
+      ],
+    );
 
     const aggregated = this.aggregatorService.aggregate(
       { distanceKm: route.distanceKm, durationMinutes: route.durationMinutes },
@@ -81,7 +90,12 @@ export class PredictionsService {
     return { orderId, ...prediction };
   }
   //заглушка
-  async predictMarine(originLat: number, originLng: number, destLat: number, destLng: number) {
+  predictMarine(
+    _originLat: number,
+    _originLng: number,
+    _destLat: number,
+    _destLng: number,
+  ) {
     return {
       recommendation: 'send',
       riskLevel: 'low',

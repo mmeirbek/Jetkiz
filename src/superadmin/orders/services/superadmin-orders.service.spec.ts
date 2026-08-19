@@ -94,6 +94,7 @@ describe('SuperadminOrdersService', () => {
     expect(prismaMock.order.update).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: order.id },
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- jest.objectContaining returns `any`
         data: expect.objectContaining({
           status: OrderStatus.ASSIGNED,
           carrier: { connect: { id: 'carrier-1' } },

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
 const EARTH_RADIUS_KM = 6371;
@@ -53,11 +54,18 @@ export class RoutePointResolverService {
     geometry: number[][],
     maxDistanceKm: number = 50,
   ) {
-    const checkpoints = await this.prisma.checkpoint.findMany();
+    const checkpoints = await this.safeFindMany(() =>
+      this.prisma.checkpoint.findMany(),
+    );
     const routePoints = this.sampleGeometry(geometry, 100);
 
     return checkpoints.filter((cp) =>
-      this.isPointNearRoute(cp.latitude, cp.longitude, routePoints, maxDistanceKm),
+      this.isPointNearRoute(
+        cp.latitude,
+        cp.longitude,
+        routePoints,
+        maxDistanceKm,
+      ),
     );
   }
 
@@ -65,7 +73,9 @@ export class RoutePointResolverService {
     geometry: number[][],
     maxDistanceKm: number = 50,
   ) {
-    const nodes = await this.prisma.trainSchedule.findMany();
+    const nodes = await this.safeFindMany(() =>
+      this.prisma.trainSchedule.findMany(),
+    );
     const routePoints = this.sampleGeometry(geometry, 100);
 
     return nodes.filter((node) =>
@@ -76,6 +86,20 @@ export class RoutePointResolverService {
         maxDistanceKm,
       ),
     );
+  }
+
+  private async safeFindMany<T>(query: () => Promise<T[]>): Promise<T[]> {
+    try {
+      return await query();
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2021'
+      ) {
+        return [];
+      }
+      throw error;
+    }
   }
 
   private sampleGeometry(

@@ -22,7 +22,8 @@ export class CheckpointLoadItemDto {
   @ApiProperty({
     type: [String],
     example: ['12.06.2026 03:01:47', '12.06.2026 04:10:45'],
-    description: 'Entry timestamps of trucks at this checkpoint (within last 48h)',
+    description:
+      'Entry timestamps of trucks at this checkpoint (within last 48h)',
   })
   entryTimes: string[];
 
