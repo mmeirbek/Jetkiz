@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Order, OrderStatus, UserRole } from '@prisma/client';
 import { AuthUser } from '../../common/types/auth-user.type';
@@ -13,6 +14,7 @@ import { UpdateOrderDto } from '../dto/update-order.dto';
 import { UpdateOrderStatusDto } from '../dto/update-order-status.dto';
 import { OrdersRepository } from '../repositories/orders.repository';
 import { RealtimeService } from '../../realtime/realtime.service';
+import { isMangystauRoute } from '../../geo/mangystau';
 
 @Injectable()
 export class OrdersService {
@@ -27,6 +29,13 @@ export class OrdersService {
     if (authUser.role === UserRole.ADMIN) {
       throw new ForbiddenException('ADMIN users cannot create orders');
     }
+
+    this.ensureMangystauRoute(
+      dto.originLat,
+      dto.originLng,
+      dto.destinationLat,
+      dto.destinationLng,
+    );
 
     const order = await this.ordersRepository.create({
       clientId: authUser.id,
@@ -82,6 +91,13 @@ export class OrdersService {
   async update(authUser: AuthUser, orderId: string, dto: UpdateOrderDto) {
     const order = await this.findVisibleOrderOrThrow(authUser, orderId);
     this.ensureClientOwnerOrSuperadmin(authUser, order);
+
+    this.ensureMangystauRoute(
+      dto.originLat ?? order.originLat,
+      dto.originLng ?? order.originLng,
+      dto.destinationLat ?? order.destinationLat,
+      dto.destinationLng ?? order.destinationLng,
+    );
 
     if (
       authUser.role !== UserRole.SUPERADMIN &&
@@ -270,5 +286,24 @@ export class OrdersService {
     }
 
     return null;
+  }
+
+  private ensureMangystauRoute(
+    originLat: number | null | undefined,
+    originLng: number | null | undefined,
+    destinationLat: number | null | undefined,
+    destinationLng: number | null | undefined,
+  ) {
+    if (
+      originLat == null ||
+      originLng == null ||
+      destinationLat == null ||
+      destinationLng == null ||
+      !isMangystauRoute(originLat, originLng, destinationLat, destinationLng)
+    ) {
+      throw new BadRequestException(
+        'Origin and destination must be inside Mangystau Region',
+      );
+    }
   }
 }
