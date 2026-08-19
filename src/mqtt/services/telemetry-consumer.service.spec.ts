@@ -25,6 +25,10 @@ describe('TelemetryConsumerService', () => {
     emitStatus: jest.fn(),
   };
 
+  const alertsServiceMock = {
+    evaluateTelemetry: jest.fn(),
+  };
+
   const activeDevice = {
     id: 'device-1',
     name: 'GPS tracker',
@@ -63,6 +67,7 @@ describe('TelemetryConsumerService', () => {
       telemetryRepositoryMock as never,
       prismaMock as never,
       realtimeServiceMock as never,
+      alertsServiceMock as never,
     );
   });
 
@@ -138,6 +143,10 @@ describe('TelemetryConsumerService', () => {
       }),
     );
     expect(realtimeServiceMock.emitTelemetry).toHaveBeenCalledWith(
+      telemetryRecord,
+    );
+    expect(alertsServiceMock.evaluateTelemetry).toHaveBeenCalledWith(
+      activeDevice,
       telemetryRecord,
     );
     expect(deviceRepositoryMock.update).toHaveBeenCalledWith(

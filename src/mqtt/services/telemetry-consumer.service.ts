@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Device, OrderStatus, Prisma } from '@prisma/client';
 import { DeviceRepository } from '../../devices/repositories/device.repository';
 import { DeviceSecretService } from '../../devices/services/device-secret.service';
+import { AlertsService } from '../../alerts/services/alerts.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RealtimeService } from '../../realtime/realtime.service';
 import { TelemetryRepository } from '../../telemetry/repositories/telemetry.repository';
@@ -27,6 +28,7 @@ export class TelemetryConsumerService {
     private readonly telemetryRepository: TelemetryRepository,
     private readonly prisma: PrismaService,
     private readonly realtimeService: RealtimeService,
+    private readonly alertsService: AlertsService,
   ) {}
 
   async handleTelemetry(deviceId: string, rawPayload: string) {
@@ -232,6 +234,8 @@ export class TelemetryConsumerService {
     );
 
     this.realtimeService.emitTelemetry(record);
+
+    await this.alertsService.evaluateTelemetry(device, record);
   }
 
   private async resolveActiveOrderId(

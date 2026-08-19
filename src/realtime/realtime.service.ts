@@ -5,6 +5,7 @@ import type { AuthUser } from '../common/types/auth-user.type';
 import { CarrierProfileRepository } from '../carrier/repositories/carrier-profile.repository';
 import { PrismaService } from '../prisma/prisma.service';
 import {
+  RealtimeAlertEvent,
   RealtimeStatusEvent,
   RealtimeSubscription,
   RealtimeTelemetryEvent,
@@ -88,10 +89,22 @@ export class RealtimeService {
     );
   }
 
+  emitAlert(event: RealtimeAlertEvent) {
+    this.emitToRooms(
+      [
+        realtimeRoom('device', event.deviceId),
+        ...(event.vehicleId ? [realtimeRoom('vehicle', event.vehicleId)] : []),
+        ...(event.orderId ? [realtimeRoom('order', event.orderId)] : []),
+      ],
+      'alert',
+      event,
+    );
+  }
+
   private emitToRooms(
     rooms: string[],
-    event: 'telemetry' | 'status',
-    payload: RealtimeTelemetryEvent | RealtimeStatusEvent,
+    event: 'telemetry' | 'status' | 'alert',
+    payload: RealtimeTelemetryEvent | RealtimeStatusEvent | RealtimeAlertEvent,
   ) {
     const server = this.server;
     if (!server) {

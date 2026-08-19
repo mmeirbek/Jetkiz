@@ -34,6 +34,18 @@ export type RealtimeStatusEvent = {
   eventTime?: string;
 };
 
+export type RealtimeAlertEvent = {
+  id: string;
+  deviceId: string;
+  vehicleId: string | null;
+  orderId: string | null;
+  metric: string;
+  value: number;
+  severity: string;
+  message: string;
+  createdAt: string;
+};
+
 export function realtimeRoom(channel: RealtimeChannelType, id: string): string {
   return `live.${channel}.${id}`;
 }

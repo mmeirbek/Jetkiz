@@ -99,6 +99,8 @@ model CarrierProfile {
   isApproved      Boolean  @default(false)
   rating          Float?
   completedOrders Int      @default(0)
+  webhookUrl      String?
+  webhookSecret   String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -129,6 +131,7 @@ model Vehicle {
 
   carrier CarrierProfile @relation(fields: [carrierId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   device  Device?
+  alerts  SensorAlert[]
 
   @@unique([carrierId, plateNumber])
   @@index([carrierId])
@@ -171,6 +174,7 @@ model Order {
   carrier        CarrierProfile? @relation(fields: [carrierId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   routes         Route[]
   trackingEvents OrderTracking[]
+  alerts         SensorAlert[]
 
   @@index([clientId])
   @@index([carrierId])
@@ -343,6 +347,8 @@ model SensorAlert {
 
   device Device     @relation(fields: [deviceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   rule   SensorRule? @relation(fields: [ruleId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  vehicle Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  order   Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@index([deviceId])
   @@index([status, createdAt])
