@@ -175,12 +175,30 @@ model Order {
   routes         Route[]
   trackingEvents OrderTracking[]
   alerts         SensorAlert[]
+  cameraSnapshots CameraSnapshot[]
 
   @@index([clientId])
   @@index([carrierId])
   @@index([assignedVehicleId])
   @@index([status])
   @@index([createdAt])
+}
+
+model CameraSnapshot {
+  id         String   @id @default(cuid())
+  deviceId   String
+  vehicleId  String?
+  orderId    String?
+  url        String
+  capturedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  order  Order? @relation(fields: [orderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([deviceId, capturedAt])
+  @@index([vehicleId, capturedAt])
+  @@index([orderId, capturedAt])
 }
 
 model Route {
@@ -286,6 +304,7 @@ model Device {
   telemetry TelemetryRecord[]
   rules     SensorRule[]
   alerts    SensorAlert[]
+  cameraSnapshots CameraSnapshot[]
 
   @@index([status])
   @@index([lastSeenAt])

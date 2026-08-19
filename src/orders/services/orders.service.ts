@@ -12,6 +12,7 @@ import { CreateOrderDto } from '../dto/create-order.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
 import { UpdateOrderStatusDto } from '../dto/update-order-status.dto';
 import { OrdersRepository } from '../repositories/orders.repository';
+import { RealtimeService } from '../../realtime/realtime.service';
 
 @Injectable()
 export class OrdersService {
@@ -19,6 +20,7 @@ export class OrdersService {
     private readonly ordersRepository: OrdersRepository,
     private readonly carrierProfileRepository: CarrierProfileRepository,
     private readonly trackingService: TrackingService,
+    private readonly realtimeService?: RealtimeService,
   ) {}
 
   async create(authUser: AuthUser, dto: CreateOrderDto) {
@@ -56,6 +58,8 @@ export class OrdersService {
       status: OrderStatus.SEARCHING,
       location: order.origin,
     });
+
+    this.realtimeService?.emitOrderAvailable(order);
 
     return { order };
   }
@@ -125,6 +129,7 @@ export class OrdersService {
       const updatedOrder = await this.ordersRepository.update(orderId, {
         status: dto.status,
       });
+      this.realtimeService?.emitOrderStatus(updatedOrder);
       await this.trackingService.recordOrderEvent({
         orderId,
         status: dto.status,
@@ -144,6 +149,7 @@ export class OrdersService {
       const updatedOrder = await this.ordersRepository.update(orderId, {
         status: dto.status,
       });
+      this.realtimeService?.emitOrderStatus(updatedOrder);
       await this.trackingService.recordOrderEvent({
         orderId,
         status: dto.status,
@@ -165,6 +171,7 @@ export class OrdersService {
       const updatedOrder = await this.ordersRepository.update(orderId, {
         status: dto.status,
       });
+      this.realtimeService?.emitOrderStatus(updatedOrder);
       await this.trackingService.recordOrderEvent({
         orderId,
         status: dto.status,

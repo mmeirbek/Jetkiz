@@ -6,6 +6,8 @@ import { CarrierProfileRepository } from '../carrier/repositories/carrier-profil
 import { PrismaService } from '../prisma/prisma.service';
 import {
   RealtimeAlertEvent,
+  RealtimeCameraEvent,
+  RealtimeOrderEvent,
   RealtimeStatusEvent,
   RealtimeSubscription,
   RealtimeTelemetryEvent,
@@ -39,7 +41,36 @@ export class RealtimeService {
     if (target.type === 'order') {
       return this.canAccessOrder(authUser, target.id);
     }
+    if (target.type === 'orders') {
+      return authUser.role === UserRole.CARRIER
+        ? { ok: true }
+        : { ok: false, reason: 'Carrier access required' };
+    }
     return this.canAccessDevice(authUser, target.id);
+  }
+
+  emitOrderAvailable(order: RealtimeOrderEvent['order']) {
+    this.server
+      ?.to(realtimeRoom('orders', 'available'))
+      .emit('order.available', { order });
+  }
+
+  emitOrderStatus(order: RealtimeOrderEvent['order']) {
+    this.emitToRooms([realtimeRoom('order', order.id)], 'order.status', {
+      order,
+    });
+  }
+
+  emitCamera(event: RealtimeCameraEvent) {
+    this.emitToRooms(
+      [
+        realtimeRoom('device', event.deviceId),
+        ...(event.vehicleId ? [realtimeRoom('vehicle', event.vehicleId)] : []),
+        ...(event.orderId ? [realtimeRoom('order', event.orderId)] : []),
+      ],
+      'camera',
+      event,
+    );
   }
 
   emitTelemetry(record: TelemetryRecord) {
@@ -103,8 +134,13 @@ export class RealtimeService {
 
   private emitToRooms(
     rooms: string[],
-    event: 'telemetry' | 'status' | 'alert',
-    payload: RealtimeTelemetryEvent | RealtimeStatusEvent | RealtimeAlertEvent,
+    event: 'telemetry' | 'status' | 'alert' | 'order.status' | 'camera',
+    payload:
+      | RealtimeTelemetryEvent
+      | RealtimeStatusEvent
+      | RealtimeAlertEvent
+      | RealtimeOrderEvent
+      | RealtimeCameraEvent,
   ) {
     const server = this.server;
     if (!server) {

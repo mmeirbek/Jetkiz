@@ -19,6 +19,7 @@ import { TelemetryModule } from './telemetry/telemetry.module';
 import { MqttModule } from './mqtt/mqtt.module';
 import { RealtimeModule } from './realtime/realtime.module';
 import { AlertsModule } from './alerts/alerts.module';
+import { CamerasModule } from './cameras/cameras.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AlertsModule } from './alerts/alerts.module';
     MqttModule,
     RealtimeModule,
     AlertsModule,
+    CamerasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

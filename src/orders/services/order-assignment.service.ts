@@ -9,6 +9,7 @@ import { CarrierProfileRepository } from '../../carrier/repositories/carrier-pro
 import { AuthUser } from '../../common/types/auth-user.type';
 import { TrackingService } from '../../tracking/services/tracking.service';
 import { OrdersRepository } from '../repositories/orders.repository';
+import { RealtimeService } from '../../realtime/realtime.service';
 
 @Injectable()
 export class OrderAssignmentService {
@@ -16,6 +17,7 @@ export class OrderAssignmentService {
     private readonly ordersRepository: OrdersRepository,
     private readonly carrierProfileRepository: CarrierProfileRepository,
     private readonly trackingService: TrackingService,
+    private readonly realtimeService?: RealtimeService,
   ) {}
 
   async assignToCurrentCarrier(authUser: AuthUser, orderId: string) {
@@ -60,6 +62,8 @@ export class OrderAssignmentService {
       status: OrderStatus.ASSIGNED,
       location: updatedOrder.origin,
     });
+
+    this.realtimeService?.emitOrderStatus(updatedOrder);
 
     return { order: updatedOrder };
   }

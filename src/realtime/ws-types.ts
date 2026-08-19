@@ -1,6 +1,8 @@
+import type { Order } from '@prisma/client';
+
 export const REALTIME_NAMESPACE = 'caspex';
 
-export type RealtimeChannelType = 'vehicle' | 'order' | 'device';
+export type RealtimeChannelType = 'vehicle' | 'order' | 'device' | 'orders';
 
 export type RealtimeSubscription = {
   type: RealtimeChannelType;
@@ -44,6 +46,18 @@ export type RealtimeAlertEvent = {
   severity: string;
   message: string;
   createdAt: string;
+};
+
+export type RealtimeOrderEvent = {
+  order: Order;
+};
+
+export type RealtimeCameraEvent = {
+  deviceId: string;
+  vehicleId: string | null;
+  orderId: string | null;
+  url: string;
+  capturedAt: string;
 };
 
 export function realtimeRoom(channel: RealtimeChannelType, id: string): string {

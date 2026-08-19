@@ -5,6 +5,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { connect, MqttClient } from 'mqtt';
+import { CamerasService } from '../../cameras/cameras.service';
 import { TelemetryConsumerService } from './telemetry-consumer.service';
 
 @Injectable()
@@ -13,7 +14,10 @@ export class MqttClientService implements OnModuleInit, OnModuleDestroy {
   private readonly prefix = process.env.MQTT_TOPIC_PREFIX ?? 'caspex';
   private client: MqttClient | null = null;
 
-  constructor(private readonly telemetryConsumer: TelemetryConsumerService) {}
+  constructor(
+    private readonly telemetryConsumer: TelemetryConsumerService,
+    private readonly camerasService: CamerasService,
+  ) {}
 
   onModuleInit() {
     const url = process.env.MQTT_URL;
@@ -32,7 +36,11 @@ export class MqttClientService implements OnModuleInit, OnModuleDestroy {
     this.client.on('connect', () => {
       this.logger.log(`Connected to MQTT broker at ${url}`);
       this.client?.subscribe(
-        [`${this.prefix}/+/telemetry`, `${this.prefix}/+/status`],
+        [
+          `${this.prefix}/+/telemetry`,
+          `${this.prefix}/+/status`,
+          `${this.prefix}/+/camera`,
+        ],
         { qos: 1 },
       );
     });
@@ -79,6 +87,8 @@ export class MqttClientService implements OnModuleInit, OnModuleDestroy {
       void this.telemetryConsumer.handleTelemetry(deviceId, text);
     } else if (kind === 'status') {
       void this.telemetryConsumer.handleStatus(deviceId, text);
+    } else if (kind === 'camera') {
+      void this.camerasService.ingest(deviceId, text);
     }
   }
 }
