@@ -142,6 +142,12 @@ Services and ports:
 | `mosquitto`        | `caspex-mosquitto`| `1883`      | MQTT broker for device telemetry                   |
 | `vroom-express`    | `caspex-vroom-express` | `3003`  | VROOM vehicle-routing optimization                 |
 | `ors-proxy`        | `caspex-ors-proxy`| internal    | Adds `Authorization` header and proxies to ORS     |
+| `frontend`         | `caspex-frontend` | `8080`      | CaspX web client (nginx SPA) — built from sibling repo `caspxx-front` |
+
+The `frontend` service builds the sibling `caspxx-front` repository
+(`../caspxx-front` next to this repo). Its API origin is set with the build
+argument `VITE_API_BASE_URL` (default `http://localhost:3000`, so the browser
+talks to `app` directly).
 
 Environment (`.env`):
 

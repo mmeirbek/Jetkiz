@@ -101,6 +101,25 @@ services:
       timeout: 10s
       retries: 5
 
+  frontend:
+    build:
+      context: ../caspxx-front
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3000}
+    container_name: caspex-frontend
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
 volumes:
   caspex_postgres_data:
   caspex_uploads_data:
