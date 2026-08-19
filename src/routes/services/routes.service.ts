@@ -14,6 +14,13 @@ import type { AuthUser } from '../../common/types/auth-user.type';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CalculateRouteDto } from '../dto/calculate-route.dto';
 import { RoutesRepository } from '../repositories/routes.repository';
+import { VroomService } from './vroom.service';
+
+type ParsedRoute = {
+  distanceKm: number;
+  durationMinutes: number;
+  geometry: { type: string; coordinates: number[][] };
+};
 
 type Coordinates = {
   startLat: number;
@@ -54,6 +61,7 @@ export class RoutesService {
     private readonly prisma: PrismaService,
     private readonly carrierProfileRepository: CarrierProfileRepository,
     private readonly routesRepository: RoutesRepository,
+    private readonly vroomService: VroomService,
   ) {}
 
   async calculate(authUser: AuthUser, dto: CalculateRouteDto) {
@@ -61,8 +69,10 @@ export class RoutesService {
       ? await this.findVisibleOrderOrThrow(authUser, dto.orderId)
       : null;
     const coords = this.resolveCoordinates(dto, order);
-    const orsResponse = await this.requestRoute(coords);
-    const parsed = this.parseRouteResponse(orsResponse);
+
+    const parsed = this.vroomService.isConfigured()
+      ? await this.requestRouteViaVroom(coords)
+      : this.parseRouteResponse(await this.requestRoute(coords));
 
     const route = await this.routesRepository.create({
       orderId: order?.id ?? null,
@@ -106,6 +116,42 @@ export class RoutesService {
     return { startLat, startLng, endLat, endLng };
   }
 
+  private async requestRouteViaVroom(coords: Coordinates): Promise<ParsedRoute> {
+    const origin: [number, number] = [coords.startLng, coords.startLat];
+    const destination: [number, number] = [coords.endLng, coords.endLat];
+
+    const response = await this.vroomService.optimize({
+      jobs: [{ id: 1, location: destination }],
+      vehicles: [
+        {
+          id: 1,
+          profile: 'driving-car',
+          start: origin,
+          end: destination,
+        },
+      ],
+      options: { g: true },
+    });
+
+    if (response.code !== 0) {
+      throw new BadGatewayException(
+        response.error ?? 'VROOM failed to optimize the route',
+      );
+    }
+
+    const route = response.routes?.[0];
+    const decoded = this.vroomService.decodeRoute(route);
+
+    return {
+      distanceKm: decoded.distanceKm,
+      durationMinutes: decoded.durationMinutes,
+      geometry: {
+        type: 'LineString',
+        coordinates: decoded.coordinates,
+      },
+    };
+  }
+
   private async requestRoute(coords: Coordinates) {
     const apiKey = process.env.OPENROUTESERVICE_API_KEY;
     if (!apiKey) {
@@ -145,7 +191,7 @@ export class RoutesService {
     }
   }
 
-  private parseRouteResponse(data: OrsDirectionsResponse) {
+  private parseRouteResponse(data: OrsDirectionsResponse): ParsedRoute {
     const feature = data.features?.[0];
     const geometry = feature?.geometry;
     const summary = feature?.properties?.summary;
@@ -216,7 +262,9 @@ export class RoutesService {
       const message =
         typeof data?.error === 'string'
           ? data.error
-          : data?.error?.message ?? data?.message ?? 'OpenRouteService request failed';
+          : (data?.error?.message ??
+            data?.message ??
+            'OpenRouteService request failed');
 
       if (status === 400 || status === 404) {
         throw new BadRequestException(message);

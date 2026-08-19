@@ -53,17 +53,31 @@ services:
       timeout: 5s
       retries: 5
 
+  ors-proxy:
+    build:
+      context: .
+      dockerfile: docker/ors-proxy/Dockerfile
+    container_name: caspex-ors-proxy
+    restart: unless-stopped
+    environment:
+      PORT: "8090"
+      OPENROUTESERVICE_API_KEY: ${OPENROUTESERVICE_API_KEY:-}
+      ORS_BASE_URL: ${OPENROUTESERVICE_BASE_URL:-https://api.openrouteservice.org}
+
   vroom-express:
     build:
       context: .
       dockerfile: docker/vroom-express/Dockerfile
     container_name: caspex-vroom-express
     restart: unless-stopped
+    depends_on:
+      - ors-proxy
     environment:
       VROOM_ROUTER: ${VROOM_ROUTER:-ors}
+      OPENROUTESERVICE_API_KEY: ${OPENROUTESERVICE_API_KEY:-}
       PORT: "3000"
     ports:
-      - "3001:3000"
+      - "3003:3000"
     healthcheck:
       test:
         [

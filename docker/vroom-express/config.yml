@@ -9,36 +9,37 @@ cliArgs:
   maxlocations: 1000 # max number of jobs/shipments locations
   maxvehicles: 200 # max number of vehicles
   override: ['c', 'g', 'l', 't', 'x'] # allow cli options override (c, g, l, t, and x)
-  path: '/usr/local/bin' # VROOM binary location
+  path: '/usr/local/bin/' # VROOM binary location
   port: 3000 # expressjs port
   router: 'ors' # routing backend (osrm, libosrm, ors, or valhalla)
   timeout: 300000 # milli-seconds
   baseurl: '/' # base url for api
 routingServers:
   ors:
-    # Public OpenRouteService API. NOTE: phase 6 wires up routing properly
-    # (self-hosted ORS or API-key auth), VROOM requires a reachable ORS server.
+    # Requests are proxied through the local `ors-proxy` service which
+    # adds the Authorization header (OPENROUTESERVICE_API_KEY) before
+    # forwarding to the public OpenRouteService API.
     driving-car:
-      host: 'api.openrouteservice.org/v2'
-      port: '443'
+      host: 'ors-proxy'
+      port: '8090'
     driving-hgv:
-      host: 'api.openrouteservice.org/v2'
-      port: '443'
+      host: 'ors-proxy'
+      port: '8090'
     cycling-regular:
-      host: 'api.openrouteservice.org/v2'
-      port: '443'
+      host: 'ors-proxy'
+      port: '8090'
     cycling-mountain:
-      host: 'api.openrouteservice.org/v2'
-      port: '443'
+      host: 'ors-proxy'
+      port: '8090'
     cycling-road:
-      host: 'api.openrouteservice.org/v2'
-      port: '443'
+      host: 'ors-proxy'
+      port: '8090'
     cycling-electric:
-      host: 'api.openrouteservice.org/v2'
-      port: '443'
+      host: 'ors-proxy'
+      port: '8090'
     foot-walking:
-      host: 'api.openrouteservice.org/v2'
-      port: '443'
+      host: 'ors-proxy'
+      port: '8090'
     foot-hiking:
-      host: 'api.openrouteservice.org/v2'
-      port: '443'
+      host: 'ors-proxy'
+      port: '8090'

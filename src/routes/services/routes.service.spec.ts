@@ -24,6 +24,11 @@ describe('RoutesService', () => {
   const routesRepositoryMock = {
     create: jest.fn(),
   };
+  const vroomServiceMock = {
+    isConfigured: jest.fn(),
+    optimize: jest.fn(),
+    decodeRoute: jest.fn(),
+  };
 
   const clientUser = {
     id: 'client-1',
@@ -81,6 +86,7 @@ describe('RoutesService', () => {
       prismaMock as never,
       carrierProfileRepositoryMock as never,
       routesRepositoryMock as never,
+      vroomServiceMock as never,
     );
   });
 
@@ -330,5 +336,102 @@ describe('RoutesService', () => {
         endLng: 49.89,
       }),
     ).rejects.toThrow(InternalServerErrorException);
+  });
+
+  it('routes through VROOM when VROOM_URL is configured', async () => {
+    vroomServiceMock.isConfigured.mockReturnValue(true);
+    vroomServiceMock.optimize.mockResolvedValue({
+      code: 0,
+      routes: [
+        {
+          vehicle: 1,
+          distance: 682120,
+          duration: 44432,
+          steps: [],
+        },
+      ],
+    });
+    vroomServiceMock.decodeRoute.mockReturnValue({
+      distanceKm: 682.12,
+      durationMinutes: 740.53,
+      coordinates: [
+        [51.17, 43.65],
+        [49.89, 40.37],
+      ],
+    });
+    routesRepositoryMock.create.mockResolvedValue({
+      id: 'route-vroom',
+      orderId: null,
+      distanceKm: 682.12,
+      durationMinutes: 740.53,
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [51.17, 43.65],
+          [49.89, 40.37],
+        ],
+      },
+      createdAt: new Date('2026-06-11T12:00:00.000Z'),
+    });
+
+    const result = await service.calculate(clientUser, {
+      startLat: 43.65,
+      startLng: 51.17,
+      endLat: 40.37,
+      endLng: 49.89,
+    });
+
+    expect(httpServiceMock.post).not.toHaveBeenCalled();
+    expect(vroomServiceMock.optimize).toHaveBeenCalledWith({
+      jobs: [{ id: 1, location: [49.89, 40.37] }],
+      vehicles: [
+        {
+          id: 1,
+          profile: 'driving-car',
+          start: [51.17, 43.65],
+          end: [49.89, 40.37],
+        },
+      ],
+      options: { g: true },
+    });
+    expect(result.routeId).toBe('route-vroom');
+    expect(result.distanceKm).toBe(682.12);
+  });
+
+  it('throws bad gateway when VROOM returns a routing error code', async () => {
+    vroomServiceMock.isConfigured.mockReturnValue(true);
+    vroomServiceMock.optimize.mockResolvedValue({
+      code: 3,
+      error: 'Routing backend failed',
+    });
+
+    await expect(
+      service.calculate(clientUser, {
+        startLat: 43.65,
+        startLng: 51.17,
+        endLat: 40.37,
+        endLng: 49.89,
+      }),
+    ).rejects.toThrow(BadGatewayException);
+  });
+
+  it('throws bad gateway when VROOM route has no geometry', async () => {
+    vroomServiceMock.isConfigured.mockReturnValue(true);
+    vroomServiceMock.optimize.mockResolvedValue({
+      code: 0,
+      routes: [{ vehicle: 1, distance: 1000, duration: 120, steps: [] }],
+    });
+    vroomServiceMock.decodeRoute.mockImplementation(() => {
+      throw new BadGatewayException('VROOM returned no route geometry');
+    });
+
+    await expect(
+      service.calculate(clientUser, {
+        startLat: 43.65,
+        startLng: 51.17,
+        endLat: 40.37,
+        endLng: 49.89,
+      }),
+    ).rejects.toThrow(BadGatewayException);
   });
 });

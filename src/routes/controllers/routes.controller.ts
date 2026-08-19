@@ -34,7 +34,7 @@ export class RoutesController {
   @Post('calculate')
   @ApiOperation({
     summary:
-      'Calculate a route with OpenRouteService and return route geometry as JSON',
+      'Calculate a route with VROOM (OpenRouteService-backed) and return optimized route geometry as JSON',
   })
   @ApiCreatedResponse({ type: CalculateRouteResponseDto })
   @ApiBadRequestResponse({
@@ -51,12 +51,10 @@ export class RoutesController {
   })
   @ApiBadGatewayResponse({
     type: ErrorResponseDto,
-    description: 'OpenRouteService request failed or returned invalid data',
+    description:
+      'VROOM/OpenRouteService request failed or returned invalid data',
   })
-  calculate(
-    @CurrentUser() authUser: AuthUser,
-    @Body() dto: CalculateRouteDto,
-  ) {
+  calculate(@CurrentUser() authUser: AuthUser, @Body() dto: CalculateRouteDto) {
     return this.routesService.calculate(authUser, dto);
   }
 }
