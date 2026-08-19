@@ -5,7 +5,7 @@ Backend for a cargo & delivery logistics platform. Built with **NestJS**, **Pris
 ## Features
 
 - **Auth & users** — registration, JWT access/refresh tokens, role-based access, superadmin bootstrap.
-- **Route calculation** — `POST /routes/calculate` via OpenRouteService (distance, duration, GeoJSON geometry).
+- **Route calculation** — `POST /routes/calculate` via VROOM vehicle-routing optimization backed by OpenRouteService (distance, duration, GeoJSON geometry).
 - **Checkpoint load scraping** — `POST /checkpoint-loads/sync` scrapes public Qoldau pages; `GET /checkpoint-loads/current` returns the normalized snapshot.
 - **Orders & tracking** — mock orders seeded from real DHL eCommerce tracking data (`npm run seed:dhl`).
 - **Predictions** — ML-backed order/delivery predictions.
@@ -123,6 +123,56 @@ $ npm run test:e2e
 
 # test coverage
 $ npm run test:cov
+```
+
+## Full-stack with Docker
+
+The whole platform runs with a single command via `docker-compose.yml`:
+
+```bash
+$ docker compose up --build
+```
+
+Services and ports:
+
+| Service            | Container         | Port (host) | Notes                                              |
+| ------------------ | ----------------- | ----------- | -------------------------------------------------- |
+| `app`              | `caspex-app`      | `3000`      | NestJS API, Swagger at `/docs`, `/health`          |
+| `postgres`         | `caspex-postgres` | `5432`      | PostgreSQL 16, migrations applied on startup       |
+| `mosquitto`        | `caspex-mosquitto`| `1883`      | MQTT broker for device telemetry                   |
+| `vroom-express`    | `caspex-vroom-express` | `3003`  | VROOM vehicle-routing optimization                 |
+| `ors-proxy`        | `caspex-ors-proxy`| internal    | Adds `Authorization` header and proxies to ORS     |
+
+Environment (`.env`):
+
+```bash
+# required for route optimization
+OPENROUTESERVICE_API_KEY="your-openrouteservice-key"
+
+# defaults below are fine for local docker
+POSTGRES_DB="caspex_db"
+POSTGRES_USER="caspex_user"
+POSTGRES_PASSWORD="change_me"
+```
+
+The compose file overrides the `localhost` values of `.env` with Docker-network hosts
+(`DATABASE_URL` → `postgres:5432`, `MQTT_URL` → `mosquitto:1883`, `VROOM_URL` →
+`vroom-express:3000`). Do not change these in `.env` — the override lives in
+`docker-compose.yml` under `app.environment`.
+
+On a fresh database volume, migrations run automatically on startup
+(`prisma migrate deploy`). Seed demo data if needed:
+
+```bash
+$ docker compose exec app npm run seed:demo
+```
+
+Verify the stack:
+
+```bash
+$ curl http://localhost:3000/health          # {"status":"ok"}
+$ curl http://localhost:3003/health          # vroom-express up
+$ API_URL=http://localhost:3000 npm run smoke:auth
 ```
 
 ## Deployment

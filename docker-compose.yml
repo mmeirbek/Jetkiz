@@ -30,12 +30,25 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      mosquitto:
+        condition: service_healthy
     env_file:
       - .env
+    environment:
+      # Docker-network hosts override the localhost values from .env.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-caspex_user}:${POSTGRES_PASSWORD:-change_me}@postgres:5432/${POSTGRES_DB:-caspex_db}
+      MQTT_URL: mqtt://mosquitto:1883
+      VROOM_URL: http://vroom-express:3000
     ports:
       - "3000:3000"
     volumes:
       - caspex_uploads_data:/app/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   mosquitto:
     image: eclipse-mosquitto:2
