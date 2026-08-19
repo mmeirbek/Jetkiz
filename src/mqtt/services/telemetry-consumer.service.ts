@@ -3,6 +3,7 @@ import { Device, OrderStatus, Prisma } from '@prisma/client';
 import { DeviceRepository } from '../../devices/repositories/device.repository';
 import { DeviceSecretService } from '../../devices/services/device-secret.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { RealtimeService } from '../../realtime/realtime.service';
 import { TelemetryRepository } from '../../telemetry/repositories/telemetry.repository';
 import type { StatusPayload, TelemetryPayload } from '../mqtt-message.types';
 
@@ -25,6 +26,7 @@ export class TelemetryConsumerService {
     private readonly deviceSecretService: DeviceSecretService,
     private readonly telemetryRepository: TelemetryRepository,
     private readonly prisma: PrismaService,
+    private readonly realtimeService: RealtimeService,
   ) {}
 
   async handleTelemetry(deviceId: string, rawPayload: string) {
@@ -65,8 +67,17 @@ export class TelemetryConsumerService {
       return;
     }
 
+    const now = new Date();
     await this.deviceRepository.update(device.id, {
       lastSeenAt: payload.eventTime ?? new Date(),
+    });
+
+    this.realtimeService.emitStatus({
+      deviceId: device.id,
+      vehicleId: device.vehicleId,
+      status: payload.status,
+      battery: payload.battery,
+      eventTime: (payload.eventTime ?? now).toISOString(),
     });
   }
 
@@ -219,6 +230,8 @@ export class TelemetryConsumerService {
     this.logger.debug(
       `Stored telemetry ${record.id} for device ${device.id} (order ${orderId ?? 'none'})`,
     );
+
+    this.realtimeService.emitTelemetry(record);
   }
 
   private async resolveActiveOrderId(

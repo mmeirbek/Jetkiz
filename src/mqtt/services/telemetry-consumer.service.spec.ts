@@ -20,6 +20,11 @@ describe('TelemetryConsumerService', () => {
     vehicle: { update: jest.fn() },
   };
 
+  const realtimeServiceMock = {
+    emitTelemetry: jest.fn(),
+    emitStatus: jest.fn(),
+  };
+
   const activeDevice = {
     id: 'device-1',
     name: 'GPS tracker',
@@ -57,6 +62,7 @@ describe('TelemetryConsumerService', () => {
       deviceSecretServiceMock as never,
       telemetryRepositoryMock as never,
       prismaMock as never,
+      realtimeServiceMock as never,
     );
   });
 
@@ -130,6 +136,9 @@ describe('TelemetryConsumerService', () => {
         lat: 45.3,
         lng: 51.1,
       }),
+    );
+    expect(realtimeServiceMock.emitTelemetry).toHaveBeenCalledWith(
+      telemetryRecord,
     );
     expect(deviceRepositoryMock.update).toHaveBeenCalledWith(
       'device-1',
@@ -220,5 +229,14 @@ describe('TelemetryConsumerService', () => {
     )[0];
     expect(deviceCall[0]).toBe('device-1');
     expect(deviceCall[1].lastSeenAt).toBeInstanceOf(Date);
+
+    expect(realtimeServiceMock.emitStatus).toHaveBeenCalledWith(
+      expect.objectContaining({
+        deviceId: 'device-1',
+        vehicleId: 'vehicle-1',
+        status: 'online',
+        battery: 90,
+      }),
+    );
   });
 });
