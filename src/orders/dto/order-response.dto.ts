@@ -26,6 +26,9 @@ export class OrderResponseDto {
   @ApiProperty({ example: 'Aktau' })
   origin: string;
 
+  @ApiProperty({ example: 'aktau', nullable: true })
+  originSettlementId: string | null;
+
   @ApiProperty({ example: 'Aktau', nullable: true })
   originCity: string | null;
 
@@ -34,6 +37,9 @@ export class OrderResponseDto {
 
   @ApiProperty({ example: 'Kuryk Port' })
   destination: string;
+
+  @ApiProperty({ example: 'kuryk', nullable: true })
+  destinationSettlementId: string | null;
 
   @ApiProperty({ example: 'Kuryk', nullable: true })
   destinationCity: string | null;
@@ -93,6 +99,30 @@ export class OrderResponseDto {
 export class OrderEnvelopeResponseDto {
   @ApiProperty({ type: OrderResponseDto })
   order: OrderResponseDto;
+}
+
+export class CalculatedRouteResponseDto {
+  @ApiProperty({ example: 'cmmi83qoc00000kirq90rte' })
+  id: string;
+
+  @ApiProperty({ example: 141.4 })
+  distanceKm: number;
+
+  @ApiProperty({ example: 141 })
+  durationMinutes: number;
+
+  @ApiProperty({
+    example: { type: 'LineString', coordinates: [[51.16, 43.65]] },
+  })
+  geometry: object;
+}
+
+export class OrderCreationResponseDto extends OrderEnvelopeResponseDto {
+  @ApiProperty({ type: CalculatedRouteResponseDto, nullable: true })
+  route: CalculatedRouteResponseDto | null;
+
+  @ApiProperty({ example: true })
+  routeCalculated: boolean;
 }
 
 export class OrdersListResponseDto {

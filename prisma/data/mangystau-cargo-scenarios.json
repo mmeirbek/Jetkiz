@@ -1,0 +1,98 @@
+[
+  {
+    "id": "water-food-to-senek",
+    "originId": "aktau",
+    "destinationId": "senek",
+    "cargoCategory": "food-and-water",
+    "cargoTitle": "Питьевая вода и продукты первой необходимости",
+    "weightTons": 8,
+    "priority": "high",
+    "seasonality": "summer",
+    "businessReason": "Регулярное снабжение удалённого населённого пункта в жаркий сезон",
+    "routeDistanceId": "zhanaozen-senek"
+  },
+  {
+    "id": "construction-to-zhanaozen",
+    "originId": "aktau",
+    "destinationId": "zhanaozen",
+    "cargoCategory": "construction-materials",
+    "cargoTitle": "Стройматериалы для городских объектов",
+    "weightTons": 18,
+    "priority": "normal",
+    "seasonality": "year-round",
+    "businessReason": "Доставка цемента, металла и отделочных материалов из логистического центра Актау",
+    "routeDistanceId": "aktau-zhanaozen"
+  },
+  {
+    "id": "fuel-to-beineu",
+    "originId": "aktau",
+    "destinationId": "beineu",
+    "cargoCategory": "fuel-and-lubricants",
+    "cargoTitle": "Топливо и смазочные материалы",
+    "weightTons": 22,
+    "priority": "high",
+    "seasonality": "year-round",
+    "businessReason": "Поддержание дальних перевозок и снабжения северо-восточной части области",
+    "routeDistanceId": "aktau-beineu"
+  },
+  {
+    "id": "auto-parts-to-zhetybai",
+    "originId": "aktau",
+    "destinationId": "zhetybai",
+    "cargoCategory": "auto-parts",
+    "cargoTitle": "Запчасти и расходники для грузового транспорта",
+    "weightTons": 4,
+    "priority": "high",
+    "seasonality": "year-round",
+    "businessReason": "Сокращение простоя техники на промышленных и нефтегазовых объектах",
+    "routeDistanceId": "aktau-zhetybai"
+  },
+  {
+    "id": "building-supplies-to-kuryk",
+    "originId": "aktau",
+    "destinationId": "kuryk",
+    "cargoCategory": "construction-materials",
+    "cargoTitle": "Стройматериалы для прибрежной инфраструктуры",
+    "weightTons": 20,
+    "priority": "normal",
+    "seasonality": "year-round",
+    "businessReason": "Региональная доставка материалов к объектам в районе Курык",
+    "routeDistanceId": "aktau-kuryk"
+  },
+  {
+    "id": "food-to-akzhigit",
+    "originId": "beineu",
+    "destinationId": "akzhigit",
+    "cargoCategory": "food-and-water",
+    "cargoTitle": "Продукты, вода и бытовые товары",
+    "weightTons": 6,
+    "priority": "high",
+    "seasonality": "summer",
+    "businessReason": "Последняя региональная миля до удалённого населённого пункта",
+    "routeDistanceId": "beineu-akzhigit"
+  },
+  {
+    "id": "industrial-equipment-to-borankul",
+    "originId": "beineu",
+    "destinationId": "borankul",
+    "cargoCategory": "industrial-equipment",
+    "cargoTitle": "Промышленное оборудование и комплектующие",
+    "weightTons": 12,
+    "priority": "normal",
+    "seasonality": "year-round",
+    "businessReason": "Снабжение удалённых производственных объектов",
+    "routeDistanceId": "beineu-borankul"
+  },
+  {
+    "id": "water-to-taushyk",
+    "originId": "aktau",
+    "destinationId": "taushyk",
+    "cargoCategory": "food-and-water",
+    "cargoTitle": "Вода и продукты для северо-западных посёлков",
+    "weightTons": 7,
+    "priority": "high",
+    "seasonality": "summer",
+    "businessReason": "Планирование поставок с учётом жары и возможных пыльных условий",
+    "routeDistanceId": "aktau-taushyk"
+  }
+]

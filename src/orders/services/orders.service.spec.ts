@@ -17,6 +17,12 @@ describe('OrdersService', () => {
   const trackingServiceMock = {
     recordOrderEvent: jest.fn(),
   };
+  const settlementsServiceMock = {
+    findOne: jest.fn(),
+  };
+  const routesServiceMock = {
+    calculateForOrder: jest.fn(),
+  };
 
   const clientUser = {
     id: 'client-1',
@@ -65,11 +71,14 @@ describe('OrdersService', () => {
       ordersRepositoryMock as never,
       carrierProfileRepositoryMock as never,
       trackingServiceMock as never,
+      settlementsServiceMock as never,
+      routesServiceMock as never,
     );
   });
 
   it('creates order for current client', async () => {
     ordersRepositoryMock.create.mockResolvedValue(order);
+    routesServiceMock.calculateForOrder.mockResolvedValue(null);
 
     const result = await service.create(clientUser, {
       title: 'Transport cargo',
@@ -99,6 +108,70 @@ describe('OrdersService', () => {
       location: order.origin,
     });
     expect(result.order.id).toBe(order.id);
+    expect(result.routeCalculated).toBe(false);
+  });
+
+  it('resolves settlements and returns the calculated route', async () => {
+    const aktau = {
+      id: 'aktau',
+      name: 'Aktau',
+      latitude: 43.65,
+      longitude: 51.16,
+    };
+    const kuryk = {
+      id: 'kuryk',
+      name: 'Kuryk',
+      latitude: 42.49,
+      longitude: 51.68,
+    };
+    const createdOrder = { ...order, origin: 'Aktau', destination: 'Kuryk' };
+    const routeRecord = {
+      id: 'route-1',
+      orderId: 'order-1',
+      distanceKm: 141.4,
+      durationMinutes: 141,
+      geometry: { type: 'LineString', coordinates: [] },
+    };
+
+    settlementsServiceMock.findOne.mockImplementation((id: string) =>
+      Promise.resolve({ settlement: id === 'aktau' ? aktau : kuryk }),
+    );
+    ordersRepositoryMock.create.mockResolvedValue(createdOrder);
+    ordersRepositoryMock.update.mockResolvedValue({
+      ...createdOrder,
+      estimatedDeliveryTime: 3,
+    });
+    routesServiceMock.calculateForOrder.mockResolvedValue(routeRecord);
+
+    const result = await service.create(clientUser, {
+      title: 'Transport cargo',
+      cargoType: 'GENERAL',
+      weight: 12,
+      volume: 40,
+      originSettlementId: 'aktau',
+      destinationSettlementId: 'kuryk',
+    });
+
+    expect(ordersRepositoryMock.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        originSettlementId: 'aktau',
+        destinationSettlementId: 'kuryk',
+        origin: 'Aktau',
+        destination: 'Kuryk',
+        originLat: 43.65,
+        originLng: 51.16,
+        destinationLat: 42.49,
+        destinationLng: 51.68,
+      }),
+    );
+    expect(routesServiceMock.calculateForOrder).toHaveBeenCalledWith(
+      createdOrder,
+    );
+    expect(ordersRepositoryMock.update).toHaveBeenCalledWith('order-1', {
+      estimatedDeliveryTime: 3,
+    });
+    expect(result.routeCalculated).toBe(true);
+    expect(result.route?.distanceKm).toBe(141.4);
   });
 
   it('rejects admin order creation', async () => {

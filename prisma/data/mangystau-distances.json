@@ -1,0 +1,173 @@
+[
+  {
+    "id": "aktau-zhanaozen",
+    "originId": "aktau",
+    "destinationId": "zhanaozen",
+    "distanceKm": 141.4,
+    "estimatedDurationMinutes": 141,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "aktau-beineu",
+    "originId": "aktau",
+    "destinationId": "beineu",
+    "distanceKm": 370.3,
+    "estimatedDurationMinutes": 370,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "aktau-shetpe",
+    "originId": "aktau",
+    "destinationId": "shetpe",
+    "distanceKm": 96.2,
+    "estimatedDurationMinutes": 96,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "aktau-zhetybai",
+    "originId": "aktau",
+    "destinationId": "zhetybai",
+    "distanceKm": 74.4,
+    "estimatedDurationMinutes": 74,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "aktau-kuryk",
+    "originId": "aktau",
+    "destinationId": "kuryk",
+    "distanceKm": 135.7,
+    "estimatedDurationMinutes": 136,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "aktau-taushyk",
+    "originId": "aktau",
+    "destinationId": "taushyk",
+    "distanceKm": 114.5,
+    "estimatedDurationMinutes": 115,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "zhanaozen-senek",
+    "originId": "zhanaozen",
+    "destinationId": "senek",
+    "distanceKm": 94.0,
+    "estimatedDurationMinutes": 94,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "zhanaozen-kyzylsay",
+    "originId": "zhanaozen",
+    "destinationId": "kyzylsay",
+    "distanceKm": 6.9,
+    "estimatedDurationMinutes": 7,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "shetpe-fort-shevchenko",
+    "originId": "shetpe",
+    "destinationId": "fort-shevchenko",
+    "distanceKm": 152.7,
+    "estimatedDurationMinutes": 153,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "beineu-akzhigit",
+    "originId": "beineu",
+    "destinationId": "akzhigit",
+    "distanceKm": 46.3,
+    "estimatedDurationMinutes": 46,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "beineu-borankul",
+    "originId": "beineu",
+    "destinationId": "borankul",
+    "distanceKm": 38.5,
+    "estimatedDurationMinutes": 39,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "aktau-mangystau",
+    "originId": "aktau",
+    "destinationId": "mangystau",
+    "distanceKm": 66.1,
+    "estimatedDurationMinutes": 66,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "aktau-akshukyr",
+    "originId": "aktau",
+    "destinationId": "akshukyr",
+    "distanceKm": 120.7,
+    "estimatedDurationMinutes": 121,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "mangystau-shetpe",
+    "originId": "mangystau",
+    "destinationId": "shetpe",
+    "distanceKm": 54.5,
+    "estimatedDurationMinutes": 55,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "shetpe-taushyk",
+    "originId": "shetpe",
+    "destinationId": "taushyk",
+    "distanceKm": 161.3,
+    "estimatedDurationMinutes": 161,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "zhanaozen-kuryk",
+    "originId": "zhanaozen",
+    "destinationId": "kuryk",
+    "distanceKm": 134.8,
+    "estimatedDurationMinutes": 135,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "zhanaozen-zhetybai",
+    "originId": "zhanaozen",
+    "destinationId": "zhetybai",
+    "distanceKm": 68.8,
+    "estimatedDurationMinutes": 69,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "beineu-shomanay",
+    "originId": "beineu",
+    "destinationId": "shomanay",
+    "distanceKm": 25.6,
+    "estimatedDurationMinutes": 26,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  },
+  {
+    "id": "kuryk-senek",
+    "originId": "kuryk",
+    "destinationId": "senek",
+    "distanceKm": 101.2,
+    "estimatedDurationMinutes": 101,
+    "method": "haversine",
+    "source": "Coordinates from mangystau-settlements.json"
+  }
+]

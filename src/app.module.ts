@@ -20,6 +20,9 @@ import { MqttModule } from './mqtt/mqtt.module';
 import { RealtimeModule } from './realtime/realtime.module';
 import { AlertsModule } from './alerts/alerts.module';
 import { CamerasModule } from './cameras/cameras.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { RouteConditionsModule } from './route-conditions/route-conditions.module';
+import { SettlementsModule } from './settlements/settlements.module';
 
 @Module({
   imports: [
@@ -41,6 +44,9 @@ import { CamerasModule } from './cameras/cameras.module';
     RealtimeModule,
     AlertsModule,
     CamerasModule,
+    AnalyticsModule,
+    RouteConditionsModule,
+    SettlementsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

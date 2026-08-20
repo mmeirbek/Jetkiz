@@ -155,7 +155,7 @@ async function main() {
   const allClients = await prisma.user.findMany({ where: { role: UserRole.CLIENT } });
   const existingOrderComments = new Set(
     (await prisma.order.findMany({
-      where: { comment: { startsWith: 'DEMO_ORDER_' } },
+      where: { comment: { startsWith: 'DEMO_' } },
       select: { comment: true },
     })).map((o) => o.comment).filter(Boolean),
   );
@@ -270,11 +270,174 @@ async function main() {
   }
 
   console.log(`  Created ${orderCount} orders with tracking events and routes`);
+
+  // ── Mangystau settlement orders ────────────────────────
+  console.log('Creating Mangystau settlement orders...');
+  const settlements = await prisma.settlement.findMany();
+  const settlementById = new Map(settlements.map((s) => [s.id, s]));
+
+  const mangystauRoutes = [
+    { originId: 'aktau', destinationId: 'kuryk' },
+    { originId: 'aktau', destinationId: 'zhanaozen' },
+    { originId: 'aktau', destinationId: 'shetpe' },
+    { originId: 'zhanaozen', destinationId: 'senek' },
+    { originId: 'aktau', destinationId: 'beineu' },
+    { originId: 'beineu', destinationId: 'akzhigit' },
+    { originId: 'aktau', destinationId: 'zhetybai' },
+    { originId: 'aktau', destinationId: 'mangystau' },
+    { originId: 'kuryk', destinationId: 'senek' },
+    { originId: 'shetpe', destinationId: 'taushyk' },
+  ];
+
+  const mangystauCargo = [
+    'Стройматериалы',
+    'Питьевая вода',
+    'Продукты',
+    'Топливо',
+    'Запчасти',
+    'Промышленное оборудование',
+  ];
+  const mangystauStatuses = [
+    OrderStatus.SEARCHING,
+    OrderStatus.ASSIGNED,
+    OrderStatus.IN_TRANSIT,
+    OrderStatus.DELIVERED,
+  ];
+
+  function haversineKm(
+    lat1: number,
+    lng1: number,
+    lat2: number,
+    lng2: number,
+  ): number {
+    const R = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLng = ((lng2 - lng1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  let mangystauOrderCount = 0;
+  for (let i = 0; i < mangystauRoutes.length; i++) {
+    const comment = `DEMO_MANGYSTAU_${i}`;
+    if (existingOrderComments.has(comment)) continue;
+
+    const { originId, destinationId } = mangystauRoutes[i];
+    const originS = settlementById.get(originId);
+    const destS = settlementById.get(destinationId);
+    if (!originS || !destS) continue;
+
+    const client = pick(allClients);
+    const cargoType = pick(mangystauCargo);
+    const status = pick(mangystauStatuses);
+    const createdAt = new Date(
+      Date.now() - Math.floor(Math.random() * 30) * 86400000,
+    );
+    const distanceKm = Number(
+      haversineKm(
+        originS.latitude,
+        originS.longitude,
+        destS.latitude,
+        destS.longitude,
+      ).toFixed(1),
+    );
+    const durationMinutes = Math.max(1, Math.round(distanceKm));
+
+    const order = await prisma.order.create({
+      data: {
+        clientId: client.id,
+        carrierId:
+          status !== OrderStatus.SEARCHING && profiles.length > 0
+            ? pick(profiles).id
+            : undefined,
+        title: `${cargoType} · ${originS.name} → ${destS.name}`,
+        cargoType,
+        weight: Number((Math.random() * 1500 + 200).toFixed(2)),
+        volume: Number((Math.random() * 25 + 2).toFixed(2)),
+        origin: originS.name,
+        originSettlementId: originS.id,
+        originCity: originS.name,
+        originCountry: 'Kazakhstan',
+        originLat: originS.latitude,
+        originLng: originS.longitude,
+        destination: destS.name,
+        destinationSettlementId: destS.id,
+        destinationCity: destS.name,
+        destinationCountry: 'Kazakhstan',
+        destinationLat: destS.latitude,
+        destinationLng: destS.longitude,
+        estimatedPrice: Math.floor(distanceKm * 2500) + 20000,
+        estimatedDeliveryTime: Math.max(
+          1,
+          Math.ceil(durationMinutes / 60),
+        ),
+        estimatedCarrierSearchTime: 60,
+        status,
+        comment,
+        createdAt,
+        updatedAt: new Date(),
+      },
+    });
+
+    await prisma.orderTracking.createMany({
+      data: [
+        {
+          orderId: order.id,
+          status: OrderStatus.ASSIGNED,
+          location: originS.name,
+          timestamp: createdAt,
+          createdAt,
+        },
+        ...(status === OrderStatus.IN_TRANSIT ||
+        status === OrderStatus.DELIVERED
+          ? [
+              {
+                orderId: order.id,
+                status: OrderStatus.IN_TRANSIT,
+                location: 'Transit',
+                timestamp: new Date(createdAt.getTime() + 86400000),
+                createdAt: new Date(createdAt.getTime() + 86400000),
+              },
+            ]
+          : []),
+        ...(status === OrderStatus.DELIVERED
+          ? [
+              {
+                orderId: order.id,
+                status: OrderStatus.DELIVERED,
+                location: destS.name,
+                timestamp: new Date(createdAt.getTime() + 3 * 86400000),
+                createdAt: new Date(createdAt.getTime() + 3 * 86400000),
+              },
+            ]
+          : []),
+      ],
+    });
+
+    if (status !== OrderStatus.SEARCHING) {
+      await prisma.route.create({
+        data: {
+          orderId: order.id,
+          distanceKm,
+          durationMinutes,
+          geometry: { type: 'LineString', coordinates: [] },
+        },
+      });
+    }
+
+    mangystauOrderCount++;
+  }
+  console.log(`  Created ${mangystauOrderCount} Mangystau settlement orders`);
+
   console.log('\nDemo data seed complete!');
   console.log(`  Clients:   ${clientCount} new (${allClients.length} total)`);
   console.log(`  Carriers:  ${carrierCount} new`);
   console.log(`  Vehicles:  ${vehicleCount} new`);
-  console.log(`  Orders:    ${orderCount} new`);
+  console.log(`  Orders:    ${orderCount} new (+${mangystauOrderCount} Mangystau)`);
 }
 
 main()

@@ -70,9 +70,7 @@ export class RoutesService {
       : null;
     const coords = this.resolveCoordinates(dto, order);
 
-    const parsed = this.vroomService.isConfigured()
-      ? await this.requestRouteViaVroom(coords)
-      : this.parseRouteResponse(await this.requestRoute(coords));
+    const parsed = await this.resolveParsedRoute(coords);
 
     const route = await this.routesRepository.create({
       orderId: order?.id ?? null,
@@ -88,6 +86,29 @@ export class RoutesService {
       durationMinutes: route.durationMinutes,
       geometry: parsed.geometry,
     };
+  }
+
+  async calculateForOrder(
+    order: Pick<
+      Order,
+      'id' | 'originLat' | 'originLng' | 'destinationLat' | 'destinationLng'
+    >,
+  ) {
+    const coords = this.resolveCoordinates({}, order);
+    const parsed = await this.resolveParsedRoute(coords);
+
+    return this.routesRepository.create({
+      orderId: order.id,
+      distanceKm: parsed.distanceKm,
+      durationMinutes: parsed.durationMinutes,
+      geometry: parsed.geometry,
+    });
+  }
+
+  private async resolveParsedRoute(coords: Coordinates): Promise<ParsedRoute> {
+    return this.vroomService.isConfigured()
+      ? await this.requestRouteViaVroom(coords)
+      : this.parseRouteResponse(await this.requestRoute(coords));
   }
 
   private resolveCoordinates(

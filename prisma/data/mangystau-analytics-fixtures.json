@@ -1,0 +1,34 @@
+{
+  "region": "Mangystau",
+  "currency": "KZT",
+  "period": "demo-baseline",
+  "districts": [
+    { "district": "Aktau", "settlementCount": 1, "demoOrderSharePercent": 22 },
+    { "district": "Zhanaozen", "settlementCount": 4, "demoOrderSharePercent": 18 },
+    { "district": "Beineu", "settlementCount": 7, "demoOrderSharePercent": 20 },
+    { "district": "Karakiya", "settlementCount": 3, "demoOrderSharePercent": 14 },
+    { "district": "Mangystau", "settlementCount": 5, "demoOrderSharePercent": 10 },
+    { "district": "Munaily", "settlementCount": 8, "demoOrderSharePercent": 9 },
+    { "district": "Tupkaragan", "settlementCount": 5, "demoOrderSharePercent": 7 }
+  ],
+  "cargoCategories": [
+    { "category": "food-and-water", "label": "Продукты и вода", "orderSharePercent": 30, "averageWeightTons": 7 },
+    { "category": "construction-materials", "label": "Стройматериалы", "orderSharePercent": 25, "averageWeightTons": 19 },
+    { "category": "fuel-and-lubricants", "label": "Топливо и смазочные материалы", "orderSharePercent": 15, "averageWeightTons": 22 },
+    { "category": "auto-parts", "label": "Запчасти", "orderSharePercent": 12, "averageWeightTons": 4 },
+    { "category": "industrial-equipment", "label": "Промышленное оборудование", "orderSharePercent": 10, "averageWeightTons": 12 },
+    { "category": "household-goods", "label": "Бытовые товары", "orderSharePercent": 8, "averageWeightTons": 5 }
+  ],
+  "routeKpis": [
+    { "routeId": "aktau-zhanaozen", "ordersPerMonth": 42, "averageEtaMinutes": 141, "averagePriceKzt": 185000, "priority": "core" },
+    { "routeId": "aktau-beineu", "ordersPerMonth": 28, "averageEtaMinutes": 370, "averagePriceKzt": 420000, "priority": "core" },
+    { "routeId": "aktau-kuryk", "ordersPerMonth": 24, "averageEtaMinutes": 136, "averagePriceKzt": 175000, "priority": "core" },
+    { "routeId": "aktau-zhetybai", "ordersPerMonth": 36, "averageEtaMinutes": 74, "averagePriceKzt": 95000, "priority": "core" },
+    { "routeId": "zhanaozen-senek", "ordersPerMonth": 16, "averageEtaMinutes": 94, "averagePriceKzt": 130000, "priority": "remote-supply" },
+    { "routeId": "beineu-akzhigit", "ordersPerMonth": 12, "averageEtaMinutes": 46, "averagePriceKzt": 70000, "priority": "remote-supply" }
+  ],
+  "weatherRiskBaseline": [
+    { "season": "summer", "heatAlertProbabilityPercent": 65, "dustAlertProbabilityPercent": 35, "windAlertProbabilityPercent": 28 },
+    { "season": "winter", "heatAlertProbabilityPercent": 0, "dustAlertProbabilityPercent": 12, "windAlertProbabilityPercent": 42 }
+  ]
+}

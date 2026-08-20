@@ -1,7 +1,7 @@
 export const MANGYSTAU_REGION = {
   name: 'Mangystau Region',
   minLat: 40.5,
-  maxLat: 44.5,
+  maxLat: 45.6,
   minLng: 50,
   maxLng: 56.5,
 } as const;

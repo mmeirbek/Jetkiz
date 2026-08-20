@@ -25,7 +25,8 @@
     "sync:qoldau": "ts-node src/checkpoint-loads/scripts/sync-qoldau-checkpoint-loads.ts",
     "seed:checkpoint": "ts-node prisma/seed-checkpoint-and-rail.ts",
     "seed:train": "ts-node prisma/seed-train-schedule.ts",
-    "seed:demo": "ts-node prisma/seed-demo-data.ts"
+    "seed:demo": "ts-node prisma/seed-demo-data.ts",
+    "seed:settlements": "ts-node prisma/seed-mangystau-settlements.ts"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
