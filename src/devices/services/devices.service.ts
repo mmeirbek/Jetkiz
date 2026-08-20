@@ -45,11 +45,19 @@ export class DevicesService {
   }
 
   async list(authUser: AuthUser) {
-    this.ensureRole(authUser);
-
     if (authUser.role === UserRole.SUPERADMIN) {
       return { devices: await this.deviceRepository.findAll() };
     }
+
+    if (authUser.role === UserRole.ADMIN) {
+      return { devices: await this.deviceRepository.findAll() };
+    }
+
+    if (authUser.role === UserRole.CLIENT) {
+      return { devices: await this.deviceRepository.findForClient(authUser.id) };
+    }
+
+    this.ensureRole(authUser);
 
     const carrierProfile = await this.carrierProfileRepository.findByUserId(
       authUser.id,

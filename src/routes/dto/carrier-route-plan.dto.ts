@@ -58,6 +58,18 @@ export class CarrierRoutePlanResponseDto {
   @ApiProperty({ example: 18.4 })
   freeTons: number;
 
+  @ApiProperty({ example: 42.6, description: 'Estimated fuel saved in liters' })
+  savedFuelLiters: number;
+
+  @ApiProperty({ example: 19170, description: 'Estimated fuel cost saved in tenge' })
+  savedMoneyTenge: number;
+
+  @ApiProperty({ example: 36, description: 'Estimated empty mileage reduced in kilometers' })
+  savedEmptyKm: number;
+
+  @ApiProperty({ example: 0.6, description: 'Estimated hours saved' })
+  savedHours: number;
+
   @ApiPropertyOptional({ nullable: true })
   route: {
     distanceKm: number;

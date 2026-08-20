@@ -40,7 +40,7 @@ import { DevicesService } from '../services/devices.service';
 @ApiTags('Devices')
 @ApiBearerAuth('bearer')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.SUPERADMIN, UserRole.CARRIER)
+@Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.CARRIER, UserRole.CLIENT)
 @ApiUnauthorizedResponse({
   type: ErrorResponseDto,
   description: 'Unauthorized',

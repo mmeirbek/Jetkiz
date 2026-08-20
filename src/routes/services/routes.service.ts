@@ -220,6 +220,18 @@ export class RoutesService {
         : null,
       capacityTons,
       freeTons,
+      savedFuelLiters: plan.route
+        ? Number((plan.route.distanceKm * 0.28 * 0.33).toFixed(1))
+        : 0,
+      savedMoneyTenge: plan.route
+        ? Math.round(plan.route.distanceKm * 0.28 * 0.33 * 450)
+        : 0,
+      savedEmptyKm: plan.route
+        ? Math.round(plan.route.distanceKm * 0.28)
+        : 0,
+      savedHours: plan.route
+        ? Number(((plan.route.distanceKm * 0.28) / 60).toFixed(1))
+        : 0,
       route: plan.route,
       stops: plan.stops,
       sequence: plan.stops

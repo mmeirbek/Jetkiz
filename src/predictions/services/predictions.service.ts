@@ -28,7 +28,9 @@ export class PredictionsService {
   async listForUser(authUser: AuthUser) {
     const orders = await this.prisma.order.findMany({
       where: {
-        clientId: authUser.id,
+        ...(authUser.role === UserRole.ADMIN || authUser.role === UserRole.SUPERADMIN
+          ? {}
+          : { clientId: authUser.id }),
         originLat: { not: null },
         originLng: { not: null },
         destinationLat: { not: null },

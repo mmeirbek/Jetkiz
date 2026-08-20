@@ -56,9 +56,11 @@ export class RealtimeService {
   }
 
   emitOrderStatus(order: RealtimeOrderEvent['order']) {
-    this.emitToRooms([realtimeRoom('order', order.id)], 'order.status', {
-      order,
-    });
+    this.emitToRooms(
+      [realtimeRoom('order', order.id), realtimeRoom('orders', 'available')],
+      'order.status',
+      { order },
+    );
   }
 
   emitCamera(event: RealtimeCameraEvent) {

@@ -7,5 +7,5 @@ import { Roles } from './roles.decorator';
 export const SuperAdminOnly = () =>
   applyDecorators(
     UseGuards(JwtAuthGuard, RolesGuard),
-    Roles(UserRole.SUPERADMIN),
+    Roles(UserRole.SUPERADMIN, UserRole.ADMIN),
   );

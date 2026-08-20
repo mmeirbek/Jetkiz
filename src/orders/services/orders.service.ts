@@ -78,6 +78,9 @@ export class OrdersService {
       isReefer: dto.isReefer ?? false,
       tempMin: dto.tempMin ?? null,
       tempMax: dto.tempMax ?? null,
+      optimalTemperature: dto.optimalTemperature ?? null,
+      optimalHumidity: dto.optimalHumidity ?? null,
+      isFragile: dto.isFragile ?? false,
       origin: originSettlement?.name ?? dto.origin!,
       originSettlementId: originSettlement?.id,
       originCity: originSettlement?.name ?? dto.originCity ?? null,
@@ -130,12 +133,21 @@ export class OrdersService {
   }
 
   async listMine(authUser: AuthUser) {
-    const orders = await this.ordersRepository.findManyForUser(authUser.id);
+    const orders =
+      authUser.role === UserRole.ADMIN || authUser.role === UserRole.SUPERADMIN
+        ? await this.ordersRepository.findAll()
+        : await this.ordersRepository.findManyForUser(authUser.id);
     return { orders };
   }
 
-  async listAvailable() {
-    const orders = await this.ordersRepository.findAvailable();
+  async listAvailable(authUser: AuthUser) {
+    const carrierProfile =
+      authUser.role === UserRole.CARRIER
+        ? await this.carrierProfileRepository.findByUserId(authUser.id)
+        : null;
+    const orders = carrierProfile
+      ? await this.ordersRepository.findAvailableForCarrier(carrierProfile.id)
+      : await this.ordersRepository.findAvailable();
     return { orders };
   }
 

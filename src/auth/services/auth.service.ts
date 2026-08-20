@@ -50,12 +50,18 @@ export class AuthService {
       firstName: dto.firstName,
       lastName: dto.lastName,
       phone: dto.phone,
+      personalDataConsentAt: new Date(),
+      privacyPolicyConsentAt: new Date(),
       avatarUrl: dto.avatarUrl ?? null,
       companyName: dto.companyName ?? null,
       companyLogo: dto.companyLogo ?? null,
       city: dto.city ?? null,
       country: dto.country ?? null,
     });
+
+    if (dto.role === UserRole.CARRIER) {
+      await this.usersRepository.createCarrierProfile(createdUser.id);
+    }
 
     return { user: toUserResponse(createdUser) };
   }

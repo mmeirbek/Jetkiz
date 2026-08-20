@@ -1,0 +1,4 @@
+ALTER TABLE "Order"
+ADD COLUMN "optimalTemperature" DOUBLE PRECISION,
+ADD COLUMN "optimalHumidity" DOUBLE PRECISION,
+ADD COLUMN "isFragile" BOOLEAN NOT NULL DEFAULT false;

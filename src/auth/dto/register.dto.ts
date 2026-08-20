@@ -7,6 +7,8 @@ import {
   MaxLength,
   MinLength,
   IsOptional,
+  IsBoolean,
+  IsIn,
 } from 'class-validator';
 import { UserRole } from '@prisma/client';
 
@@ -57,6 +59,16 @@ export class RegisterDto {
   @MinLength(6)
   @MaxLength(25)
   phone: string;
+
+  @ApiProperty({ example: true, description: 'Consent to personal data processing is required' })
+  @IsBoolean()
+  @IsIn([true])
+  personalDataConsent: boolean;
+
+  @ApiProperty({ example: true, description: 'Privacy policy consent is required' })
+  @IsBoolean()
+  @IsIn([true])
+  privacyPolicyConsent: boolean;
 
   @ApiProperty({ example: 'https://example.com/avatar.jpg', required: false })
   @IsOptional()

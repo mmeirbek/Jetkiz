@@ -29,6 +29,15 @@ const carriers = [
   { email: 'steppe-freight@mail.kz', firstName: 'Димаш', lastName: 'Кунанбаев', company: 'Steppe Freight KZ', city: 'Astana', phone: '+77099990055', transportType: 'truck', experienceYears: 3 },
 ];
 
+const admins = [
+  {
+    email: 'admin@caspex.local',
+    firstName: 'CaspX',
+    lastName: 'Admin',
+    phone: '+77010000002',
+  },
+];
+
 const vehiclesData = [
   { brand: 'Volvo', model: 'FH16', year: 2022, plateNumber: '001AAA01', capacityTons: 20, cargoVolume: 82 },
   { brand: 'Scania', model: 'R500', year: 2023, plateNumber: '002BBB01', capacityTons: 22, cargoVolume: 86 },
@@ -41,6 +50,32 @@ const vehiclesData = [
 
 async function main() {
   const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS ?? '12');
+
+  console.log('Creating admins...');
+  let adminCount = 0;
+  for (const admin of admins) {
+    const existing = await prisma.user.findUnique({
+      where: { email: admin.email },
+    });
+    if (existing) continue;
+
+    await prisma.user.create({
+      data: {
+        email: admin.email,
+        passwordHash: await bcrypt.hash('Admin_123', saltRounds),
+        role: UserRole.ADMIN,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        phone: admin.phone,
+        companyName: 'CaspX Administration',
+        city: 'Aktau',
+        country: 'Kazakhstan',
+        isActive: true,
+      },
+    });
+    adminCount++;
+  }
+  console.log(`  Created ${adminCount} admins`);
 
   // ── Clients ─────────────────────────────────────────────
   console.log('Creating clients...');

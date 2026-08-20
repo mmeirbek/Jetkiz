@@ -32,6 +32,15 @@ export class OrderResponseDto {
   @ApiProperty({ example: 4, nullable: true })
   tempMax: number | null;
 
+  @ApiProperty({ example: 18, nullable: true })
+  optimalTemperature: number | null;
+
+  @ApiProperty({ example: 60, nullable: true })
+  optimalHumidity: number | null;
+
+  @ApiProperty({ example: false })
+  isFragile: boolean;
+
   @ApiProperty({ example: 'Aktau' })
   origin: string;
 

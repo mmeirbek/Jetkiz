@@ -30,9 +30,23 @@ export class UsersRepository {
     companyLogo?: string | null;
     city?: string | null;
     country?: string | null;
+    personalDataConsentAt?: Date | null;
+    privacyPolicyConsentAt?: Date | null;
   }): Promise<User> {
     return this.prisma.user.create({
       data: params,
+    });
+  }
+
+  async createCarrierProfile(userId: string) {
+    return this.prisma.carrierProfile.create({
+      data: {
+        userId,
+        experienceYears: 0,
+        transportType: 'ROAD',
+        description: null,
+        isApproved: false,
+      },
     });
   }
 

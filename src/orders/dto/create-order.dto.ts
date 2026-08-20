@@ -74,6 +74,27 @@ export class CreateOrderDto {
   @Max(100)
   tempMax?: number;
 
+  @ApiProperty({ example: 18, required: false, description: 'Optimal cargo temperature in °C' })
+  @Type(() => Number)
+  @IsOptional()
+  @IsNumber()
+  @Min(-100)
+  @Max(100)
+  optimalTemperature?: number;
+
+  @ApiProperty({ example: 60, required: false, description: 'Optimal cargo humidity in percent' })
+  @Type(() => Number)
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  optimalHumidity?: number;
+
+  @ApiProperty({ example: false, required: false })
+  @IsOptional()
+  @IsBoolean()
+  isFragile?: boolean;
+
   @ApiProperty({
     example: 'aktau',
     required: false,

@@ -82,8 +82,8 @@ export class OrdersController {
   @Get('available')
   @ApiOperation({ summary: 'List orders available for carrier assignment' })
   @ApiOkResponse({ type: OrdersListResponseDto })
-  available() {
-    return this.ordersService.listAvailable();
+  available(@CurrentUser() authUser: AuthUser) {
+    return this.ordersService.listAvailable(authUser);
   }
 
   @Get(':id')

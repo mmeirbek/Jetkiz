@@ -52,6 +52,19 @@ export class DeviceRepository {
     });
   }
 
+  findForClient(clientId: string): Promise<Device[]> {
+    return this.prisma.device.findMany({
+      where: {
+        vehicle: {
+          carrier: {
+            orders: { some: { clientId } },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   update(id: string, data: Prisma.DeviceUncheckedUpdateInput): Promise<Device> {
     return this.prisma.device.update({ where: { id }, data });
   }
