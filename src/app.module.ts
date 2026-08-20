@@ -23,6 +23,7 @@ import { CamerasModule } from './cameras/cameras.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { RouteConditionsModule } from './route-conditions/route-conditions.module';
 import { SettlementsModule } from './settlements/settlements.module';
+import { GeocodeModule } from './geocode/geocode.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { SettlementsModule } from './settlements/settlements.module';
     AnalyticsModule,
     RouteConditionsModule,
     SettlementsModule,
+    GeocodeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

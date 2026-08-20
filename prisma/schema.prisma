@@ -180,6 +180,7 @@ model Order {
   trackingEvents OrderTracking[]
   alerts         SensorAlert[]
   cameraSnapshots CameraSnapshot[]
+  prediction     OrderPrediction?
 
   @@index([clientId])
   @@index([carrierId])
@@ -313,6 +314,24 @@ model RefreshToken {
 
   @@index([userId, revokedAt])
   @@index([expiresAt])
+}
+
+model OrderPrediction {
+  id                   String   @id @default(cuid())
+  orderId              String   @unique
+  recommendation       String
+  riskLevel            String
+  bestDepartureTime    DateTime
+  expectedDelayMinutes Int
+  shortExplanation     String
+  inputSnapshot        Json
+  source               String   @default("rule")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([createdAt])
 }
 
 model Device {

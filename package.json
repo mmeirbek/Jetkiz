@@ -26,7 +26,8 @@
     "seed:checkpoint": "ts-node prisma/seed-checkpoint-and-rail.ts",
     "seed:train": "ts-node prisma/seed-train-schedule.ts",
     "seed:demo": "ts-node prisma/seed-demo-data.ts",
-    "seed:settlements": "ts-node prisma/seed-mangystau-settlements.ts"
+    "seed:settlements": "ts-node prisma/seed-mangystau-settlements.ts",
+    "seed:telemetry": "ts-node prisma/seed-telemetry.ts"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
