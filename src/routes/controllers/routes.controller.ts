@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBadGatewayResponse,
   ApiBadRequestResponse,
@@ -6,6 +6,7 @@ import {
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -18,6 +19,7 @@ import {
   CalculateRouteDto,
   CalculateRouteResponseDto,
 } from '../dto/calculate-route.dto';
+import { CarrierRoutePlanResponseDto } from '../dto/carrier-route-plan.dto';
 import { RoutesService } from '../services/routes.service';
 
 @Controller('routes')
@@ -56,5 +58,23 @@ export class RoutesController {
   })
   calculate(@CurrentUser() authUser: AuthUser, @Body() dto: CalculateRouteDto) {
     return this.routesService.calculate(authUser, dto);
+  }
+
+  @Get('plan')
+  @ApiOperation({
+    summary:
+      'Return an optimized multi-stop route plan for the current carrier covering all active orders (pickup/delivery sequence)',
+  })
+  @ApiOkResponse({ type: CarrierRoutePlanResponseDto })
+  @ApiForbiddenResponse({
+    type: ErrorResponseDto,
+    description: 'CARRIER role is required',
+  })
+  @ApiNotFoundResponse({
+    type: ErrorResponseDto,
+    description: 'Carrier profile not found',
+  })
+  plan(@CurrentUser() authUser: AuthUser) {
+    return this.routesService.calculateCarrierRoute(authUser);
   }
 }

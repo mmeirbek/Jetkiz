@@ -26,6 +26,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import type { AuthUser } from '../../common/types/auth-user.type';
 import { CreateOrderDto } from '../dto/create-order.dto';
 import {
+  OrderAssignmentResponseDto,
   OrderCreationResponseDto,
   OrderEnvelopeResponseDto,
   OrdersListResponseDto,
@@ -148,7 +149,7 @@ export class OrdersController {
 
   @Post(':id/assign')
   @ApiOperation({ summary: 'Assign available order to current carrier' })
-  @ApiOkResponse({ type: OrderEnvelopeResponseDto })
+  @ApiOkResponse({ type: OrderAssignmentResponseDto })
   @ApiForbiddenResponse({
     type: ErrorResponseDto,
     description: 'CARRIER role or approved carrier profile is required',
@@ -170,7 +171,7 @@ export class OrdersController {
 
   @Post(':id/accept')
   @ApiOperation({ summary: 'Accept available order as current carrier' })
-  @ApiOkResponse({ type: OrderEnvelopeResponseDto })
+  @ApiOkResponse({ type: OrderAssignmentResponseDto })
   @ApiForbiddenResponse({
     type: ErrorResponseDto,
     description: 'CARRIER role or approved carrier profile is required',
@@ -192,7 +193,7 @@ export class OrdersController {
 
   @Patch(':id/assign')
   @ApiOperation({ summary: 'Assign available order to current carrier' })
-  @ApiOkResponse({ type: OrderEnvelopeResponseDto })
+  @ApiOkResponse({ type: OrderAssignmentResponseDto })
   @ApiForbiddenResponse({
     type: ErrorResponseDto,
     description: 'CARRIER role or approved carrier profile is required',

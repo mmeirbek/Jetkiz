@@ -16,6 +16,9 @@ export type VroomJob = {
   service?: number;
   setup?: number;
   time_windows?: Array<[number, number]>;
+  pickup?: number[];
+  delivery?: number[];
+  amount?: number[];
 };
 
 export type VroomVehicle = {

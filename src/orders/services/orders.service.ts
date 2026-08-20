@@ -2,6 +2,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
@@ -20,6 +21,8 @@ import { RoutesService } from '../../routes/services/routes.service';
 
 @Injectable()
 export class OrdersService {
+  private readonly logger = new Logger(OrdersService.name);
+
   constructor(
     private readonly ordersRepository: OrdersRepository,
     private readonly carrierProfileRepository: CarrierProfileRepository,
@@ -384,7 +387,11 @@ export class OrdersService {
   private async tryCalculateRoute(order: Order): Promise<Route | null> {
     try {
       return await this.routesService.calculateForOrder(order);
-    } catch {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(
+        `Route calculation failed for order ${order.id}: ${message}`,
+      );
       return null;
     }
   }

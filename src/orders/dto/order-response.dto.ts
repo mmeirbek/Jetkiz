@@ -101,6 +101,17 @@ export class OrderEnvelopeResponseDto {
   order: OrderResponseDto;
 }
 
+export class OrderAssignmentResponseDto extends OrderEnvelopeResponseDto {
+  @ApiProperty({ example: 20, description: 'Vehicle capacity in tons' })
+  capacityTons: number;
+
+  @ApiProperty({
+    example: 19.2,
+    description: 'Remaining free capacity in tons',
+  })
+  freeCapacityTons: number;
+}
+
 export class CalculatedRouteResponseDto {
   @ApiProperty({ example: 'cmmi83qoc00000kirq90rte' })
   id: string;

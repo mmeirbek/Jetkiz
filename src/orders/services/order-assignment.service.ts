@@ -7,6 +7,7 @@ import {
 import { OrderStatus, UserRole } from '@prisma/client';
 import { CarrierProfileRepository } from '../../carrier/repositories/carrier-profile.repository';
 import { AuthUser } from '../../common/types/auth-user.type';
+import { PrismaService } from '../../prisma/prisma.service';
 import { TrackingService } from '../../tracking/services/tracking.service';
 import { OrdersRepository } from '../repositories/orders.repository';
 import { RealtimeService } from '../../realtime/realtime.service';
@@ -17,6 +18,7 @@ export class OrderAssignmentService {
     private readonly ordersRepository: OrdersRepository,
     private readonly carrierProfileRepository: CarrierProfileRepository,
     private readonly trackingService: TrackingService,
+    private readonly prisma: PrismaService,
     private readonly realtimeService?: RealtimeService,
   ) {}
 
@@ -52,6 +54,21 @@ export class OrderAssignmentService {
       throw new ConflictException('Order cannot be assigned in current status');
     }
 
+    const capacity = await this.calculateCarrierCapacity(carrierProfile.id);
+
+    if (!capacity.vehicle) {
+      throw new ConflictException(
+        'Carrier has no registered vehicle to carry the order',
+      );
+    }
+
+    if (capacity.freeKg < order.weight || capacity.freeM3 < order.volume) {
+      const orderTons = Number((order.weight / 1000).toFixed(3));
+      throw new ConflictException(
+        `Not enough free capacity on the vehicle: ${capacity.freeTons} t / ${capacity.freeM3} m³ free, order needs ${orderTons} t / ${order.volume} m³`,
+      );
+    }
+
     const updatedOrder = await this.ordersRepository.update(orderId, {
       carrier: { connect: { id: carrierProfile.id } },
       status: OrderStatus.ASSIGNED,
@@ -65,7 +82,55 @@ export class OrderAssignmentService {
 
     this.realtimeService?.emitOrderStatus(updatedOrder);
 
-    return { order: updatedOrder };
+    return {
+      order: updatedOrder,
+      capacityTons: capacity.capacityTons,
+      freeCapacityTons: capacity.freeTons,
+    };
+  }
+
+  private async calculateCarrierCapacity(carrierId: string) {
+    const vehicles = await this.prisma.vehicle.findMany({
+      where: { carrierId },
+      orderBy: [{ lastSeenAt: 'desc' }, { createdAt: 'desc' }],
+    });
+    const vehicle = vehicles[0] ?? null;
+
+    const activeOrders = await this.prisma.order.findMany({
+      where: {
+        carrierId,
+        status: {
+          in: [
+            OrderStatus.ASSIGNED,
+            OrderStatus.PICKED_UP,
+            OrderStatus.IN_TRANSIT,
+            OrderStatus.AT_CHECKPOINT,
+          ],
+        },
+      },
+      select: { weight: true, volume: true },
+    });
+
+    const usedKg = activeOrders.reduce(
+      (sum, order) => sum + (order.weight ?? 0),
+      0,
+    );
+    const usedM3 = activeOrders.reduce(
+      (sum, order) => sum + (order.volume ?? 0),
+      0,
+    );
+    const capacityTons = vehicle?.capacityTons ?? 0;
+    const cargoVolume = vehicle?.cargoVolume ?? 0;
+    const freeKg = vehicle ? Math.max(0, capacityTons * 1000 - usedKg) : 0;
+    const freeM3 = vehicle ? Math.max(0, cargoVolume - usedM3) : 0;
+
+    return {
+      vehicle,
+      capacityTons,
+      freeTons: Number((freeKg / 1000).toFixed(3)),
+      freeKg,
+      freeM3,
+    };
   }
 
   private isAssignableStatus(status: OrderStatus) {

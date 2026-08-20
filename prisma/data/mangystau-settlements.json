@@ -5,7 +5,7 @@
 {"id":"beineu","name":"Beineu","nameRu":"Бейнеу","nameKk":"Бейнеу","type":"village","district":"Beineu","latitude":45.32,"longitude":55.20,"source":"Wikipedia"},
 {"id":"shetpe","name":"Shetpe","nameRu":"Шетпе","nameKk":"Шетпе","type":"village","district":"Mangystau","latitude":44.17,"longitude":52.12,"source":"Wikipedia"},
 {"id":"mangystau","name":"Mangystau","nameRu":"Мангистау","nameKk":"Маңғыстау","type":"village","district":"Munaily","latitude":43.69,"longitude":51.98,"source":"Wikipedia"},
-{"id":"kuryk","name":"Kuryk","nameRu":"Курык","nameKk":"Құрық","type":"village","district":"Karakiya","latitude":42.49,"longitude":51.68,"source":"Wikipedia"},
+{"id":"kuryk","name":"Kuryk","nameRu":"Курык","nameKk":"Құрық","type":"village","district":"Karakiya","latitude":43.1789,"longitude":51.6814,"source":"Wikipedia"},
 {"id":"zhetybai","name":"Zhetybai","nameRu":"Жетыбай","nameKk":"Жетібай","type":"village","district":"Karakiya","latitude":43.59,"longitude":52.08,"source":"Wikipedia"},
 {"id":"bautino","name":"Bautino","nameRu":"Баутино","nameKk":"Баутино","type":"village","district":"Tupkaragan","latitude":44.54,"longitude":50.24,"source":"Wikipedia"},
 {"id":"akshukyr","name":"Akshukyr","nameRu":"Акшукур","nameKk":"Ақшұқыр","type":"village","district":"Tupkaragan","latitude":44.37,"longitude":50.03,"source":"Wikipedia"},
