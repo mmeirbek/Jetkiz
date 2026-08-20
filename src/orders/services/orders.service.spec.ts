@@ -1,4 +1,8 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { OrderStatus, UserRole } from '@prisma/client';
 import { OrdersService } from './orders.service';
 
@@ -211,5 +215,72 @@ describe('OrdersService', () => {
     await expect(service.getById(clientUser, order.id)).rejects.toThrow(
       NotFoundException,
     );
+  });
+
+  it('persists reefer fields when provided', async () => {
+    ordersRepositoryMock.create.mockResolvedValue(order);
+    routesServiceMock.calculateForOrder.mockResolvedValue(null);
+
+    await service.create(clientUser, {
+      title: 'Frozen goods to Zhanaozen',
+      cargoType: 'FROZEN',
+      weight: 5,
+      volume: 12,
+      origin: 'Aktau',
+      destination: 'Zhanaozen',
+      originLat: 43.6532,
+      originLng: 51.1975,
+      destinationLat: 43.3401,
+      destinationLng: 53.3273,
+      isReefer: true,
+      tempMin: -18,
+      tempMax: -12,
+    });
+
+    expect(ordersRepositoryMock.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isReefer: true,
+        tempMin: -18,
+        tempMax: -12,
+      }),
+    );
+  });
+
+  it('rejects reefer order without temperature range', async () => {
+    await expect(
+      service.create(clientUser, {
+        title: 'Frozen goods to Zhanaozen',
+        cargoType: 'FROZEN',
+        weight: 5,
+        volume: 12,
+        origin: 'Aktau',
+        destination: 'Zhanaozen',
+        originLat: 43.6532,
+        originLng: 51.1975,
+        destinationLat: 43.3401,
+        destinationLng: 53.3273,
+        isReefer: true,
+      }),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('rejects invalid temperature range', async () => {
+    await expect(
+      service.create(clientUser, {
+        title: 'Frozen goods to Zhanaozen',
+        cargoType: 'FROZEN',
+        weight: 5,
+        volume: 12,
+        origin: 'Aktau',
+        destination: 'Zhanaozen',
+        originLat: 43.6532,
+        originLng: 51.1975,
+        destinationLat: 43.3401,
+        destinationLng: 53.3273,
+        isReefer: true,
+        tempMin: 4,
+        tempMax: -18,
+      }),
+    ).rejects.toThrow(BadRequestException);
   });
 });

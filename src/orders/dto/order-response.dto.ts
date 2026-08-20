@@ -23,6 +23,15 @@ export class OrderResponseDto {
   @ApiProperty({ example: 42 })
   volume: number;
 
+  @ApiProperty({ example: false })
+  isReefer: boolean;
+
+  @ApiProperty({ example: -18, nullable: true })
+  tempMin: number | null;
+
+  @ApiProperty({ example: 4, nullable: true })
+  tempMax: number | null;
+
   @ApiProperty({ example: 'Aktau' })
   origin: string;
 

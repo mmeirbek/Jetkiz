@@ -3,6 +3,7 @@ import { Transform, Type, type TransformFnParams } from 'class-transformer';
 import {
   ArrayMaxSize,
   IsArray,
+  IsBoolean,
   IsInt,
   IsNumber,
   IsOptional,
@@ -47,6 +48,31 @@ export class CreateOrderDto {
   @IsNumber()
   @Min(0)
   volume: number;
+
+  @ApiProperty({
+    example: true,
+    required: false,
+    description: 'Requires a refrigerated vehicle',
+  })
+  @IsOptional()
+  @IsBoolean()
+  isReefer?: boolean;
+
+  @ApiProperty({ example: -18, required: false, description: 'Min temp in °C' })
+  @Type(() => Number)
+  @IsOptional()
+  @IsNumber()
+  @Min(-100)
+  @Max(100)
+  tempMin?: number;
+
+  @ApiProperty({ example: 4, required: false, description: 'Max temp in °C' })
+  @Type(() => Number)
+  @IsOptional()
+  @IsNumber()
+  @Min(-100)
+  @Max(100)
+  tempMax?: number;
 
   @ApiProperty({
     example: 'aktau',

@@ -37,6 +37,21 @@ export class OrdersService {
       throw new ForbiddenException('ADMIN users cannot create orders');
     }
 
+    if (dto.isReefer && (dto.tempMin == null || dto.tempMax == null)) {
+      throw new BadRequestException(
+        'Reefer orders require tempMin and tempMax values',
+      );
+    }
+    if (
+      dto.tempMin != null &&
+      dto.tempMax != null &&
+      dto.tempMax < dto.tempMin
+    ) {
+      throw new BadRequestException(
+        'tempMax must be greater than or equal to tempMin',
+      );
+    }
+
     const { originSettlement, destinationSettlement } =
       await this.resolveSettlements(dto);
 
@@ -60,6 +75,9 @@ export class OrdersService {
       cargoType: dto.cargoType,
       weight: dto.weight,
       volume: dto.volume,
+      isReefer: dto.isReefer ?? false,
+      tempMin: dto.tempMin ?? null,
+      tempMax: dto.tempMax ?? null,
       origin: originSettlement?.name ?? dto.origin!,
       originSettlementId: originSettlement?.id,
       originCity: originSettlement?.name ?? dto.originCity ?? null,
